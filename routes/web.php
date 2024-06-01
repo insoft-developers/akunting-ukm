@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Main\DashboardController;
+use App\Http\Controllers\Main\AccountController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,6 +17,14 @@ use App\Http\Controllers\Main\DashboardController;
 */
 
 Route::get('/', [DashboardController::class, 'index']);
+Route::get('/frontend_register', [AccountController::class, 'register']);
+Route::post('/signup', [AccountController::class, 'signup']);
+
+
+
+// Route::get('/', function(){
+//     return view('welcome');
+// });
 
 Route::get('/dashboard', function () {
     return view('dashboard');
