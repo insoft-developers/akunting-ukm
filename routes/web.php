@@ -19,7 +19,8 @@ use App\Http\Controllers\Main\AccountController;
 Route::get('/', [DashboardController::class, 'index']);
 Route::get('/frontend_register', [AccountController::class, 'register']);
 Route::post('/signup', [AccountController::class, 'signup']);
-
+Route::get('/frontend_login', [AccountController::class, 'login']);
+Route::post('/login_action', [AccountController::class, 'login_action'])->name('login.action');
 
 
 // Route::get('/', function(){

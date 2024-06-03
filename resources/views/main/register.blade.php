@@ -192,7 +192,7 @@ $setting = \App\Models\Setting::findorFail(1);
                     </form>
                     <div class="mt-5 text-muted">
                         <span>Sudah mempunyai akun..?</span>
-                        <a href="auth-login-cover.html" class="fw-bold">Masuk</a>
+                        <a href="{{ url('frontend_login') }}" class="fw-bold">Masuk</a>
                     </div>
                 </div>
             </div>

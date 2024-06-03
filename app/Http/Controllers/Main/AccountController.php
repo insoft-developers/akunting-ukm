@@ -9,12 +9,39 @@ use Validator;
 use Illuminate\Support\Str;
 use DB;
 use Session;
+use Illuminate\Support\Facades\Hash;
 
 class AccountController extends Controller
 {
-    public function register() {
+    
+	public function login() {
+		$view = 'login';
+		return view('main.login', compact('view'));
+	}
+	
+	public function login_action(Request $request) {
+		$input = $request->all();
+		$rules = array(
+			"email" => "email|required",
+			"password" => "required|min:8"
+		);
+		$validator = Validator::make($input, $rules);
+		if($validator->fails()) {
+			return redirect()->back()->withInput()->withErrors($validator);   
+		} 
+
+		$account = Account::where('email', $input['email'])->first();
+		if (Hash::check($input['password'], $account->password)) {
+			return true;
+		} else {
+			
+		}
+
+	}
+
+	public function register() {
         $view = "register";
-        return view('main.register');
+        return view('main.register', compact('view'));
     }
 
     public function signup(Request $request) {
