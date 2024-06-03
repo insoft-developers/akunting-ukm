@@ -39,15 +39,20 @@ $setting = \App\Models\Setting::findorFail(1);
 
     <style>
         @media only screen and (min-width: 769px) {
-            body {
+           
+            .background-image {
                 background: 
                     linear-gradient(
                     rgba(0, 0, 0, 0.7), 
                     rgba(0, 0, 0, 0.7)
                     ),
                     url("{{ asset('template/main/images/bg.jpg') }}");
+                background-repeat: no-repeat;
+                background-position: center center;
+                background-attachment: fixed;
                 background-size: cover;
-            
+                height: 100vh;
+                width: 100%;
             }
             .register-box{
                 width: 350px !important;
@@ -83,8 +88,8 @@ $setting = \App\Models\Setting::findorFail(1);
             .footer-register{
                 color: white;
                 position: relative;
-                bottom: 33px;
-                left: 86px;
+                bottom: 53px;
+                left: 106px;
             }
             .help-block{
                 color: red;
@@ -117,7 +122,7 @@ $setting = \App\Models\Setting::findorFail(1);
     </style>
 </head>
 
-<body>
+<body class="background-image">
     <!--! ================================================================ !-->
     <!--! [Start] Main Content !-->
     <!--! ================================================================ !-->
