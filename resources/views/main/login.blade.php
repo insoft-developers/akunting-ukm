@@ -31,6 +31,7 @@ $setting = \App\Models\Setting::findorFail(1);
     <link rel="stylesheet" type="text/css" href="{{ asset('template/main') }}/css/theme.min.css">
     <!--! END: Custom CSS-->
     <style>
+       
         .background-image {
             background: 
                 linear-gradient(
@@ -116,7 +117,9 @@ $setting = \App\Models\Setting::findorFail(1);
                 </div>
             </div>
         </div>
+        <div style="margin-top: 100px;"></div>
     </main>
+    
    
     <!--! BEGIN: Vendors JS !-->
     <script src="{{ asset('template/main') }}/vendors/js/vendors.min.js"></script>

@@ -25,6 +25,8 @@ $setting = \App\Models\Setting::findorFail(1);
     <link rel="stylesheet" type="text/css" href="{{ asset('template/main') }}/css/bootstrap.min.css">
     <!--! END: Bootstrap CSS-->
     <!--! BEGIN: Vendors CSS-->
+    <link rel="stylesheet" type="text/css" href="{{ asset('template/main') }}/vendors/css/select2.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ asset('template/main') }}/vendors/css/select2-theme.min.css">
     <link rel="stylesheet" type="text/css" href="{{ asset('template/main') }}/vendors/css/vendors.min.css">
     <!--! END: Vendors CSS-->
     <!--! BEGIN: Custom CSS-->
@@ -38,6 +40,11 @@ $setting = \App\Models\Setting::findorFail(1);
 		<![endif]-->
 
     <style>
+        .select2-selection__rendered{
+            margin-top: -5px !important;
+            font-size: 14px;
+            
+        }
         @media only screen and (min-width: 769px) {
            
             .background-image {
@@ -149,18 +156,23 @@ $setting = \App\Models\Setting::findorFail(1);
                     <form method="POST" action="{{ url('signup') }}" class="w-100 mt-4 pt-2">
                         @csrf
                         <div class="mb-3">
+                            <input type="text" class="form-control" id="fullname" name="fullname" placeholder="Nama Sesuai KTP">
+                            @if($errors->has('fullname'))
+                                <span class="help-block">{{ $errors->first('fullname') }}</span>
+                            @endif
+                        </div>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Username">
+                            @if($errors->has('username'))
+                                <span class="help-block">{{ $errors->first('username') }}</span>
+                            @endif
+                        </div>
+                        <div class="mb-3">
                             <input type="text" class="form-control" id="email" name="email" placeholder="Alamat Email">
                             @if($errors->has('email'))
                                 <span class="help-block">{{ $errors->first('email') }}</span>
                             @endif
                         </div>
-                        <div class="mb-3">
-                            <input type="text" class="form-control" id="fullname" name="fullname" placeholder="Nama Panggilan">
-                            @if($errors->has('fullname'))
-                                <span class="help-block">{{ $errors->first('fullname') }}</span>
-                            @endif
-                        </div>
-                        
                         <div class="mb-3">
                             <input type="text" class="form-control" id="whatsapp" name="whatsapp" placeholder="Nomor Whatsapp">
                             @if($errors->has('whatsapp'))
@@ -179,6 +191,49 @@ $setting = \App\Models\Setting::findorFail(1);
                                 <span class="help-block">{{ $errors->first('password_confirmation') }}</span>
                             @endif
                         </div>
+                        <hr />
+                        <div class="mb-3">
+                            <select class="form-control" id="category" name="category">
+                                <option value="">Kategori Usaha</option>
+                                @foreach($category as $cat)
+                                <option value="{{ $cat->id }}">{{ $cat->category_name }}</option>
+                                @endforeach
+                            </select>
+                            @if($errors->has('category'))
+                                <span class="help-block">{{ $errors->first('fullname') }}</span>
+                            @endif
+                        </div>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="business_name" name="business_name" placeholder="Nama Bisnis">
+                            @if($errors->has('business_name'))
+                                <span class="help-block">{{ $errors->first('business_name') }}</span>
+                            @endif
+                        </div>
+                       
+                        <div class="mb-3">
+                            <select class="form-control" id="district" name="district">
+                                <option value="">Kecamatan, Kabupaten, Provinsi</option>
+                                @foreach($district as $d)
+                                <option value="{{ $d->provinsi }}, {{ $d->kabupaten }}, {{ $d->distrik }}">{{ $d->provinsi }}, {{ $d->kabupaten }}, {{ $d->distrik }}</option>
+                                @endforeach
+                            </select>
+                            @if($errors->has('district'))
+                                <span class="help-block">{{ $errors->first('district') }}</span>
+                            @endif
+                        </div>
+                        <div class="mb-3">
+                            <textarea class="form-control" id="full_address" name="full_address" placeholder="Alamat Lengkap"></textarea>
+                            @if($errors->has('full_address'))
+                                <span class="help-block">{{ $errors->first('full_address') }}</span>
+                            @endif
+                        </div>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="business_phone" name="business_phone" placeholder="No Telepon Bisnis">
+                            @if($errors->has('business_phone'))
+                                <span class="help-block">{{ $errors->first('business_phone') }}</span>
+                            @endif
+                        </div>
+
                         <div class="mt-4">
                             <div class="custom-control custom-checkbox mb-2">
                                 <input type="checkbox" class="custom-control-input" id="tos" name="tos">
@@ -214,6 +269,9 @@ $setting = \App\Models\Setting::findorFail(1);
     <!--! Footer Script !-->
     <!--! ================================================================ !-->
     <!--! BEGIN: Vendors JS !-->
+
+    
+
     <script src="{{ asset('template/main') }}/vendors/js/vendors.min.js"></script>
     <!-- vendors.min.js {always must need to be top} -->
     <script src="{{ asset('template/main') }}/vendors/js/lslstrength.min.js"></script>
@@ -223,6 +281,8 @@ $setting = \App\Models\Setting::findorFail(1);
     <!--! END: Apps Init !-->
     <!--! BEGIN: Theme Customizer  !-->
     <script src="{{ asset('template/main') }}/js/theme-customizer-init.min.js"></script>
+    <script src="{{ asset('template/main') }}/vendors/js/select2.min.js"></script>
+    <script src="{{ asset('template/main') }}/vendors/js/select2-active.min.js"></script>
     <script>
         $("#tos").click(function(){
             if($('#tos').prop('checked')) {
@@ -233,6 +293,11 @@ $setting = \App\Models\Setting::findorFail(1);
         })
     </script>
     <!--! END: Theme Customizer !-->
+
+    <script>
+        $("#category").select2();
+        $("#district").select2();
+    </script>
 </body>
 
 </html>

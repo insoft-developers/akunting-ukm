@@ -25,6 +25,8 @@ $setting = \App\Models\Setting::findorFail(1);
     <link rel="stylesheet" type="text/css" href="{{ asset('template/main') }}/css/bootstrap.min.css" />
     <!--! END: Bootstrap CSS-->
     <!--! BEGIN: Vendors CSS-->
+    <link rel="stylesheet" type="text/css" href="{{ asset('template/main') }}/vendors/css/select2.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ asset('template/main') }}/vendors/css/select2-theme.min.css">
     <link rel="stylesheet" type="text/css" href="{{ asset('template/main') }}/vendors/css/vendors.min.css" />
     <link rel="stylesheet" type="text/css" href="{{ asset('template/main') }}/vendors/css/daterangepicker.min.css" />
     <!--! END: Vendors CSS-->
@@ -628,6 +630,8 @@ $setting = \App\Models\Setting::findorFail(1);
     <!--! BEGIN: Vendors JS !-->
     <script src="{{ asset('template/main') }}/vendors/js/vendors.min.js"></script>
     <!-- vendors.min.js {always must need to be top} -->
+    <script src="{{ asset('template/main') }}/vendors/js/select2.min.js"></script>
+    <script src="{{ asset('template/main') }}/vendors/js/select2-active.min.js"></script>
     <script src="{{ asset('template/main') }}/vendors/js/daterangepicker.min.js"></script>
     <script src="{{ asset('template/main') }}/vendors/js/apexcharts.min.js"></script>
     <script src="{{ asset('template/main') }}/vendors/js/circle-progress.min.js"></script>
@@ -639,6 +643,8 @@ $setting = \App\Models\Setting::findorFail(1);
     <!--! BEGIN: Theme Customizer  !-->
     <script src="{{ asset('template/main') }}/js/theme-customizer-init.min.js"></script>
     <!--! END: Theme Customizer !-->
+
+    @include('main.js')
 </body>
 
 </html>

@@ -9,7 +9,9 @@ use Validator;
 use Illuminate\Support\Str;
 use DB;
 use Session;
+use App\Models\Category;
 use Illuminate\Support\Facades\Hash;
+
 
 class AccountController extends Controller
 {
@@ -41,7 +43,13 @@ class AccountController extends Controller
 
 	public function register() {
         $view = "register";
-        return view('main.register', compact('view'));
+		$category = Category::all();
+		$district = DB::table('districts')
+			->select('districts.name AS distrik', 'regencies.name AS kabupaten', 'provinces.name AS provinsi')
+			->join('regencies', 'regencies.id', '=', 'districts.regency_id')
+			->join('provinces', 'provinces.id', '=', 'regencies.province_id')
+			->get();
+        return view('main.register', compact('view', 'category', 'district'));
     }
 
     public function signup(Request $request) {
