@@ -21,6 +21,7 @@ Route::get('/frontend_register', [AccountController::class, 'register']);
 Route::post('/signup', [AccountController::class, 'signup']);
 Route::get('/frontend_login', [AccountController::class, 'login']);
 Route::post('/login_action', [AccountController::class, 'login_action'])->name('login.action');
+Route::get('/frontend_logout', [AccountController::class, 'logout']);
 
 
 // Route::get('/', function(){
@@ -30,6 +31,8 @@ Route::post('/login_action', [AccountController::class, 'login_action'])->name('
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::get('/get_account_receive/{id}', [DashboardController::class, 'get_account_receive']);
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

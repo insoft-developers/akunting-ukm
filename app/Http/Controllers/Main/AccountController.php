@@ -11,11 +11,19 @@ use DB;
 use Session;
 use App\Models\Category;
 use Illuminate\Support\Facades\Hash;
+use Redirect;
 
 
 class AccountController extends Controller
 {
     
+	public function logout(Request $request) {
+        $request->session()->regenerate();
+        $request->session()->invalidate();
+        $request->session()->flush();
+        return redirect('/frontend_login');
+    }
+	
 	public function login() {
 		$view = 'login';
 		return view('main.login', compact('view'));
@@ -25,19 +33,33 @@ class AccountController extends Controller
 		$input = $request->all();
 		$rules = array(
 			"email" => "email|required",
-			"password" => "required|min:8"
+			"password" => "required|min:6"
 		);
 		$validator = Validator::make($input, $rules);
 		if($validator->fails()) {
 			return redirect()->back()->withInput()->withErrors($validator);   
 		} 
 
-		$account = Account::where('email', $input['email'])->first();
-		if (Hash::check($input['password'], $account->password)) {
-			return true;
-		} else {
-			
+		try{
+			$account = Account::where('email', $input['email'])->first();
+			if (Hash::check($input['password'], $account->password)) {
+				if($account->is_soft_delete == 1) {
+					return Redirect::back()->with('error', "Account Not Found!");
+				}else {
+					$generate_token = Str::random(36);
+					session(["id"=> $account->id, "username"=> $account->username, 'name'=> $account->fullname, "email"=> $account->email, "token"=> $generate_token, "is_upgraded"=> $account->is_upgraded]);
+
+					Account::where('id', $account->id)
+						->update(['token'=> $generate_token]);
+					return Redirect::to('/');
+				}
+			} else {
+				return Redirect::back()->with('error', "The email address or password you entered is incorrect, please try again!"); 
+			}
+		}catch(\Exception $e) {
+			return redirect()->back()->with('error', "The email address or password you entered is incorrect, please try again!");  
 		}
+		
 
 	}
 
@@ -58,9 +80,11 @@ class AccountController extends Controller
         $rules = array(
             "email" => "required|email|unique:ml_accounts,email",
             "fullname" => "required|min:4|max:34",
+			"username" => "required|unique:ml_accounts,username",
             "whatsapp" => "required",
             "password" => "required|min:6|confirmed",
-            "tos" => "required"
+            "tos" => "required",
+			"category" => "required"
         );
 
         $validator = Validator::make($input, $rules);
@@ -69,7 +93,6 @@ class AccountController extends Controller
         }
         $uuid = (String) Str::uuid();
         $input['uuid'] = $uuid;
-        $input['username'] = $uuid;
         $input['password'] = bcrypt($input['password']);
         $input['status'] = 0;
         $input['roles'] = 1;
@@ -84,6 +107,17 @@ class AccountController extends Controller
                 "role_code" => "administrator",
             ]);
         }
+
+		$bg = new \App\Models\BusinessGroup;
+		$bg->user_id = $id;
+		$bg->branch_name = empty($input['business_name']) ? $input['fullname'] : $input['business_name'];
+		$bg->business_category = $input['category'];
+		$bg->business_district = $input['district'];
+		$bg->business_address =  $input['full_address'];
+		$bg->business_phone = empty($input['business_phone']) ? $input['whatsapp'] : $input['business_phone'];
+		$bg->model = "main";
+		$bg->save();
+
 
         $this->insert_ml_current_assets($id);
         $this->insert_ml_fixed_assets($id);
@@ -101,6 +135,8 @@ class AccountController extends Controller
         $create_user_info = ['user_id' => $id, 'phone_number' => $input['whatsapp']];
         DB::table('ml_user_information')->insert($create_user_info);
 
+
+
         // Automaticaly login to dashboard afte successfuly signup
         // $res = $this->db->sql_prepare("select id, username from ml_accounts where id = :id");
         // $bindParam = $this->db->sql_bindParam(['id' => $id], $res);
@@ -111,7 +147,7 @@ class AccountController extends Controller
         $generate_token = Str::random(36);
 
         // $set_session	= ['id' => $row['id'], 'client_id' => 0, 'username' => $row['username'], 'token' => $generate_token];
-        session(["id"=> $id, "client_id"=> 0, "username" => $uuid, "token"=> $generate_token]);
+        session(["id"=> $id, "client_id"=> 0, "username" => $input['username'], "token"=> $generate_token]);
 
         // $this->db->sql_update(['token' => $generate_token], 'ml_accounts', ['id' => $row['id']]);
         Account::where('id',$id)->update([
@@ -157,10 +193,13 @@ class AccountController extends Controller
 			'Piutang Marketplace',
 			'Perlengkapan',
 			'Persediaan Bahan Baku',
+			'Persedian Barang Setengah Jadi',
 			'Persediaan Barang Dagang',
 			'Piutang Usaha',
 			'Sewa Bayar Dimuka',
-			'Iklan Bayar Dimuka'
+			'Iklan Bayar Dimuka',
+			'Randu Wallet',
+
 		];
 
 		foreach ($data as $key => $value) 
@@ -269,7 +308,7 @@ class AccountController extends Controller
 		$data = 
 		[
 			'Pendapatan',
-			'Penjualan Barang',
+			'Penjualan Produk',
 			'Ikhtisar Laba/Rugi',
 			'Potongan Penjualan',
 			'Retur Penjualan'
@@ -308,8 +347,10 @@ class AccountController extends Controller
 	{
 		$data = 
 		[
+			'Biaya Bonus Penjualan',
 			'Biaya Pengiriman',
 			'Biaya Penjualan Lain-Lain',
+			'Pajak Penjualan',
 			'Biaya Iklan',
 			'Biaya Retur Penjualan',
 			'Biaya Kerusakan Barang'
@@ -337,6 +378,7 @@ class AccountController extends Controller
 			'Biaya Perlengkapan',
 			'Biaya Sewa Tempat Usaha',
 			'Biaya Telepon',
+			'Biaya Internet',
 			'Biaya Umum Lain-Lain',
 			'Biaya Penyusutan Bangunan',
 			'Biaya Penyusutan Kendaraan',
@@ -377,7 +419,8 @@ class AccountController extends Controller
 	{
 		$data = 
 		[
-			'Biaya Administrasi Bank'
+			'Biaya Administrasi Bank',
+			'Biaya Lain Lain'
 		];
 
 		foreach ($data as $key => $value) 

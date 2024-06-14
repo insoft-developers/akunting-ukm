@@ -156,25 +156,25 @@ $setting = \App\Models\Setting::findorFail(1);
                     <form method="POST" action="{{ url('signup') }}" class="w-100 mt-4 pt-2">
                         @csrf
                         <div class="mb-3">
-                            <input type="text" class="form-control" id="fullname" name="fullname" placeholder="Nama Sesuai KTP">
+                            <input type="text" value="{{ old('fullname') }}" class="form-control" id="fullname" name="fullname" placeholder="Nama Sesuai KTP">
                             @if($errors->has('fullname'))
                                 <span class="help-block">{{ $errors->first('fullname') }}</span>
                             @endif
                         </div>
                         <div class="mb-3">
-                            <input type="text" class="form-control" id="username" name="username" placeholder="Username">
+                            <input type="text" value="{{ old('username') }}" class="form-control" id="username" name="username" placeholder="Username">
                             @if($errors->has('username'))
                                 <span class="help-block">{{ $errors->first('username') }}</span>
                             @endif
                         </div>
                         <div class="mb-3">
-                            <input type="text" class="form-control" id="email" name="email" placeholder="Alamat Email">
+                            <input type="text" value="{{ old('email') }}" class="form-control" id="email" name="email" placeholder="Alamat Email">
                             @if($errors->has('email'))
                                 <span class="help-block">{{ $errors->first('email') }}</span>
                             @endif
                         </div>
                         <div class="mb-3">
-                            <input type="text" class="form-control" id="whatsapp" name="whatsapp" placeholder="Nomor Whatsapp">
+                            <input type="text" value="{{ old('whatsapp') }}" class="form-control" id="whatsapp" name="whatsapp" placeholder="Nomor Whatsapp">
                             @if($errors->has('whatsapp'))
                                 <span class="help-block">{{ $errors->first('whatsapp') }}</span>
                             @endif
@@ -200,11 +200,11 @@ $setting = \App\Models\Setting::findorFail(1);
                                 @endforeach
                             </select>
                             @if($errors->has('category'))
-                                <span class="help-block">{{ $errors->first('fullname') }}</span>
+                                <span class="help-block">{{ $errors->first('category') }}</span>
                             @endif
                         </div>
                         <div class="mb-3">
-                            <input type="text" class="form-control" id="business_name" name="business_name" placeholder="Nama Bisnis">
+                            <input type="text" value="{{ old('business_name') }}" class="form-control" id="business_name" name="business_name" placeholder="Nama Bisnis">
                             @if($errors->has('business_name'))
                                 <span class="help-block">{{ $errors->first('business_name') }}</span>
                             @endif
@@ -222,13 +222,13 @@ $setting = \App\Models\Setting::findorFail(1);
                             @endif
                         </div>
                         <div class="mb-3">
-                            <textarea class="form-control" id="full_address" name="full_address" placeholder="Alamat Lengkap"></textarea>
+                            <textarea class="form-control" value="{{ old('full_address') }}" id="full_address" name="full_address" placeholder="Alamat Lengkap"></textarea>
                             @if($errors->has('full_address'))
                                 <span class="help-block">{{ $errors->first('full_address') }}</span>
                             @endif
                         </div>
                         <div class="mb-3">
-                            <input type="text" class="form-control" id="business_phone" name="business_phone" placeholder="No Telepon Bisnis">
+                            <input type="text" class="form-control" value="{{ old('business_phone') }}" id="business_phone" name="business_phone" placeholder="No Telepon Bisnis">
                             @if($errors->has('business_phone'))
                                 <span class="help-block">{{ $errors->first('business_phone') }}</span>
                             @endif

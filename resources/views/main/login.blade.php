@@ -76,9 +76,17 @@ $setting = \App\Models\Setting::findorFail(1);
             <div class="minimal-card-wrapper">
                 <center><img class="img-login" src="{{ asset('template/main/images/login_depan.png') }}"></center>
                 <div class="card mb-4 mt-5 mx-4 mx-sm-0 position-relative card-login">
-                    
+                   
                     <div class="card-body p-sm-5">
-                        
+                        @if ( session()->has('error') )
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="alert alert-danger">
+                                        {!! session('error') !!}
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                         <form method="POST" action="{{ route('login.action') }}" class="w-100 pt-2">
                             @csrf
                             <div class="mb-4">

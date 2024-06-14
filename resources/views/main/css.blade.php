@@ -36,5 +36,67 @@
     .nxl-arrow{
         margin-top: 12px !important;
     }
+    .pull-right {
+        float: right !important;
+        position: absolute;
+        right: 76px !important;
+    }
+    .footer{
+        position: absolute;
+        width: 100%;
+        bottom: 0;
+    }
+    .mtop10{
+        margin-top: 10px !important;
+    }
+    .mtop20{
+        margin-top: 20px !important;
+    }
+    .mtop30{
+        margin-top: 30px !important;
+    }
+    .mtop40{
+        margin-top: 40px !important;
+    }
+    .mtop50{
+        margin-top: 50px !important;
+    }
+    .mtop60{
+        margin-top: 60px !important;
+    }
+    .mtop70{
+        margin-top: 70px !important;
+    }
+    .mtop80{
+        margin-top: 80px !important;
+    }
+    .mtop90{
+        margin-top: 90px !important;
+    }
+    .mtop100{
+        margin-top: 100px !important;
+    }
+    .cust-control{
+        height: 36px;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
+    .page-header{
+        min-height:30px !important;
+
+    }
+    .main-box{
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    .select2-selection__rendered{
+        padding-top: -5px !important;
+        font-size: 14px;
+        padding-top:2px !important;
+
+    }
+
+  
 
 </style>
