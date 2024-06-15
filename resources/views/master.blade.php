@@ -34,6 +34,7 @@ $setting = \App\Models\Setting::findorFail(1);
     <!--! END: Vendors CSS-->
     <!--! BEGIN: Custom CSS-->
     <link rel="stylesheet" type="text/css" href="{{ asset('template/main') }}/css/theme.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" integrity="sha512-3pIirOrwegjM6erE5gPSwkUzO+3cTjpnV9lexlNZqvupR64iZBnOOTiiLPb9M36zpMScbmUNIcHUqKD47M719g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!--! END: Custom CSS-->
     <!--! HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries !-->
     <!--! WARNING: Respond.js doesn"t work if you view the page via file: !-->
@@ -549,60 +550,15 @@ $setting = \App\Models\Setting::findorFail(1);
     <script src="{{ asset('template/main') }}/vendors/js/select2.min.js"></script>
     <script src="{{ asset('template/main') }}/vendors/js/select2-active.min.js"></script>
     <!--! END: Theme Customizer !-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
 
     @include('main.js')
+    @include('modal')
 
-    @if($view == 'jurnal')
-    <div class="modal fade" id="modal-tambah">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header" style="background-color: #2f467a;">
-              <h5 class="modal-title" style="color:white;">Transaksi Baru</h5>
-              <a href="javascript:void(0);" class="btn btn-sm btn-info">
-                <i class="fa fa-plus-square"></i>
-            </a>
-            </div>
-            <div class="modal-body">
-              <div class="row">
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <input type="date" id="tanggal_transaksi" name="tanggal_transaksi" class="form-control cust-control">
-                    </div>
-                </div>
-                <div class="col-md-8">
-                    <div class="form-group">
-                        <select class="form-control cust-control" id="jenis_transaksi" name="jenis_transaksi">
-                            <option value="">Pilih transaksi</option>
-                            @foreach ($list_transaksi as $item)
-                            <option value="{{ $item->id }}">{{ $item->transaction_name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-              </div>
-              <div class="mtop20"></div>
-              <div class="form-group">
-                <label>Diterima Dari:</label>
-                <select class="form-control cust-control" id="receive_from" name="receive_from">
-                    <option value="">Pilih diterima dari</option>
-                 </select>
-              </div>
-              <div class="mtop20"></div>
-              <div class="form-group">
-                <label>Disimpan Ke:</label>
-                <select class="form-control cust-control" id="save_to" name="save_to">
-                    <option value="">Pilih disimpan ke</option>
-                </select>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-              <button type="button" class="btn btn-primary">Simpan</button>
-            </div>
-          </div>
-        </div>
-    </div>
-    @endif
+    
+    
 </body>
 
 </html>

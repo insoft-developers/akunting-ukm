@@ -7,55 +7,213 @@ use Illuminate\Http\Request;
 use App\Models\MlTransaction;
 use DB;
 use Session;
+use Validator;
+use App\Traits\CommonTrait;
 
 class DashboardController extends Controller
 {
+    use CommonTrait;
+    
+
     public function index() {
         $view = "jurnal";
-        $list_transaksi = MlTransaction::orderBy('created', 'desc')->get();
+        $list_transaksi = MlTransaction::orderBy('id', 'asc')->get();
         return view('main.dashboard', compact('view','list_transaksi'));
     }
+
+    public function save_jurnal(Request $request) {
+        $input = $request->all();
+
+       
+        $rules = array(
+            "tanggal_transaksi" => "required",
+            "jenis_transaksi" => "required",
+            "receive_from" => "required",
+            "save_to" => "required",
+        );
+
+        $validator = Validator::make($input, $rules);
+        if($validator->fails()) {
+            $pesan = $validator->errors();
+            $pesanarr = explode(",", $pesan);
+            $find = array("[","]","{","}");
+            $html = '';
+            foreach($pesanarr as $p ) {
+                $n = str_replace($find,"",$p);
+                $o = strstr($n, ':', false);
+                $html .= str_replace(":", "", $o).'<br>';
+            }
+
+            return response()->json([
+            	"success" => false,
+            	"message" => $html
+            ]);
+        }
+
+        $nominal 	= $input['nominal'];
+        $date 		= strtotime($input['tanggal_transaksi']);
+
+        $data_journal = [
+            'userid'			=> session('id'),
+            'transaction_id'	=> $input['jenis_transaksi'],
+            'transaction_name'	=> $this->checkTransactionName($input['keterangan']),
+            'rf_accode_id'		=> $input['receive_from'],
+            'st_accode_id'		=> $input['save_to'],
+            'debt_data'			=> '',
+            'nominal'			=> $nominal,
+            'color_date'		=> $this->get_data_transaction($input['jenis_transaksi'], 'color'),
+            'created'			=> $date
+        ];
+
+        // First insert data to journal
+        // $this->db->sql_insert($data_journal, 'ml_journal');
+
+        $journal_id = DB::table('ml_journal')->insertGetId($data_journal);
+
+        // Get last ID Journal after insert
+        
+
+        if ($input['receive_from'] !== '')
+        {
+            $account_code_id1 = explode("_", $input['receive_from']);
+        }
+        
+        if ($input['save_to'] !== '')
+        {
+            $account_code_id2 = explode("_", $input['save_to']);
+        }
+
+        $data_journal_st_accode = [
+            'journal_id'		=> $journal_id,
+            'st_accode_id'		=> $input['save_to'],
+            'account_code_id'	=> $account_code_id2[1],
+            'asset_data_id'		=> $account_code_id2[0],
+            'asset_data_name'	=> $this->getAllListAssetWithAccDataId($this->get_user('id'), $account_code_id2[0], $account_code_id2[1]),
+            'debet'				=> $nominal,
+            'created'			=> $date
+        ];
+
+        // First insert data to journal list
+        // $this->db->sql_insert($data_journal_st_accode, 'ml_journal_list');
+        DB::table('ml_journal_list')->insert($data_journal_st_accode);
+
+        $data_journal_rf_accode = [
+            'journal_id'		=> $journal_id,
+            'rf_accode_id'		=> $input['receive_from'],
+            'account_code_id'	=> $account_code_id1[1],
+            'asset_data_id'		=> $account_code_id1[0],
+            'asset_data_name'	=> $this->getAllListAssetWithAccDataId($this->get_user('id'), $account_code_id1[0], $account_code_id1[1]),
+            'credit'			=> $nominal,
+            'created'			=> $date
+        ];
+
+        // Second insert data to journal list
+        // $this->db->sql_insert($data_journal_rf_accode, 'ml_journal_list');
+        DB::table('ml_journal_list')->insert($data_journal_rf_accode);
+
+        // Update total saldo
+        $reCalculateTotalSaldo = $this->checkTotalBalance($journal_id);
+
+        // Second update data to journal
+        // $this->db->sql_update(['total_balance' => $reCalculateTotalSaldo], 'ml_journal', ['id' => $journal_id]);
+
+        DB::table('ml_journal')->where('id', $journal_id)->update(["total_balance"=>$reCalculateTotalSaldo]);
+
+        // if ($this->input->post('status_submit') == 'approved')
+        // {
+        //     $this->reGenerateOpeningBalance();
+        // }
+
+
+        return response()->json([
+            "success" => true,
+            "message" => 'success'
+
+        ]);
+    }
+
+
+    public function checkTotalBalance($journal_id)
+	{
+		$total_all_debit 	= 0;
+		$total_all_credit 	= 0;
+
+		$i = 0;
+		// $res_journal_list = $this->db->sql_prepare("select * from ml_journal_list where journal_id = :journal_id order by id");
+		// $bindParam_journal_list = $this->db->sql_bindParam(['journal_id' => $journal_id], $res_journal_list);
+
+        $bindParam_journal_list = DB::table('ml_journal_list')
+            ->where('journal_id', $journal_id)->get();
+
+		// while ($row_journal_list = $this->db->sql_fetch_single($bindParam_journal_list))
+		// {
+		// 	$total_all_debit += $row_journal_list['debet'];
+		// 	$total_all_credit += $row_journal_list['credit'];			
+		// }
+
+        foreach($bindParam_journal_list as $key) {
+            $total_all_debit += $key->debet;
+			$total_all_credit += $key->credit;
+        }
+
+		$new_output['total_all_debit'] = $total_all_debit;
+		$new_output['total_all_credit'] = $total_all_credit;
+
+		if ($new_output['total_all_debit'] == $new_output['total_all_credit'])
+		{
+			$output = $new_output['total_all_debit'];
+		}
+		else
+		{
+			$new_total_all_dc = $new_output['total_all_debit']-$new_output['total_all_credit'];
+
+			$output = $new_total_all_dc;
+		}
+
+		// echo $output;
+		// exit;
+
+		return $output;
+	}
+
+    public function checkTransactionName($transaction_name)
+	{
+		// $res = $this->db->sql_prepare("select * from ml_journal where userid = :userid and transaction_name = :transaction_name");
+		// $bindParam = $this->db->sql_bindParam(['userid' => get_user('id'), 'transaction_name' => $transaction_name], $res);
+		// $row = $this->db->sql_fetch_single($bindParam);
+
+        $row = DB::table('ml_journal')
+            ->where('userid', session('id'))
+            ->where('transaction_name', $transaction_name);
+            
+
+		if ($row->count()>0)
+		{
+			$total = $row->count() + 1;
+
+			$output = $transaction_name.' ('.$total.')';
+		}
+		else
+		{
+			$output = $transaction_name;
+		}
+
+		return $output;
+	}
+
 
     public function get_account_receive($id) {
         $data = [];
         $group = [];
+        
+        $simpan = [];
+        $kelompok = [];
+        
         $user_id = session('id');
 
         
-        if($id == 1) {
-            $query = DB::table('ml_income')
-                ->where('userid', $user_id)
-                ->get();
-
-            foreach($query as $key) {
-                $row['id'] = $key->id;
-                $row['group'] = "Pendapatan";
-                $row['acount_code_id'] = $key->account_code_id;
-                $row['code'] = $key->code;
-                $row['name'] = $key->name;
-                array_push($data, $row);
-            }
-            array_push($group, 'Pendapatan');
-        }
-            
-        if($id == 1){
-            $query = DB::table('ml_non_business_income')
-                ->where('userid', $user_id)
-                ->get();
-
-            foreach($query as $key) {
-                $row['id'] = $key->id;
-                $row['group'] = "Pendapatan Di Luar Usaha";
-                $row['acount_code_id'] = $key->account_code_id;
-                $row['code'] = $key->code;
-                $row['name'] = $key->name;
-                array_push($data, $row);
-            }
-            array_push($group, "Pendapatan Di Luar Usaha");
-           
-        }
-
-        if($id == 2){
+        
+        if($id == 2 || $id == 5 || $id == 8 || $id == 9 || $id == 10){
             $query = DB::table('ml_current_assets')
                 ->where('userid', $user_id)
                 ->get();
@@ -63,16 +221,17 @@ class DashboardController extends Controller
             foreach($query as $key) {
                 $row['id'] = $key->id;
                 $row['group'] = "Aktiva Lancar";
-                $row['acount_code_id'] = $key->account_code_id;
+                $row['account_code_id'] = $key->account_code_id;
                 $row['code'] = $key->code;
                 $row['name'] = $key->name;
                 array_push($data, $row);
             }
             array_push($group, "Aktiva Lancar");
-           
         }
 
-        if($id == 2){
+
+
+        if($id == 2 || $id == 8 || $id == 9 || $id == 10){
             $query = DB::table('ml_fixed_assets')
                 ->where('userid', $user_id)
                 ->get();
@@ -80,7 +239,7 @@ class DashboardController extends Controller
             foreach($query as $key) {
                 $row['id'] = $key->id;
                 $row['group'] = "Aktiva Tetap";
-                $row['acount_code_id'] = $key->account_code_id;
+                $row['account_code_id'] = $key->account_code_id;
                 $row['code'] = $key->code;
                 $row['name'] = $key->name;
                 array_push($data, $row);
@@ -89,9 +248,386 @@ class DashboardController extends Controller
            
         }
 
+        if($id == 10){
+            $query = DB::table('ml_accumulated_depreciation')
+                ->where('userid', $user_id)
+                ->get();
+
+            foreach($query as $key) {
+                $row['id'] = $key->id;
+                $row['group'] = "Akumulasi Penyusutan";
+                $row['account_code_id'] = $key->account_code_id;
+                $row['code'] = $key->code;
+                $row['name'] = $key->name;
+                array_push($data, $row);
+            }
+            array_push($group, "Akumulasi Penyusutan");
+           
+        }
+
+
+        if($id == 3 || $id == 10){
+            $query = DB::table('ml_shortterm_debt')
+                ->where('userid', $user_id)
+                ->get();
+
+            foreach($query as $key) {
+                $row['id'] = $key->id;
+                $row['group'] = "Utang Jangka Pendek";
+                $row['account_code_id'] = $key->account_code_id;
+                $row['code'] = $key->code;
+                $row['name'] = $key->name;
+                array_push($data, $row);
+            }
+            array_push($group, "Utang Jangka Pendek");
+           
+        }
+
+
+        
+
+        if($id == 1 || $id == 5 || $id == 10) {
+            $query = DB::table('ml_income')
+                ->where('userid', $user_id)
+                ->get();
+
+            foreach($query as $key) {
+                $row['id'] = $key->id;
+                $row['group'] = "Pendapatan";
+                $row['account_code_id'] = $key->account_code_id;
+                $row['code'] = $key->code;
+                $row['name'] = $key->name;
+                array_push($data, $row);
+            }
+            array_push($group, 'Pendapatan');
+        }
+            
+        
+
+        if($id == 5 || $id == 7){
+            $query = DB::table('ml_capital')
+                ->where('userid', $user_id)
+                ->get();
+
+            foreach($query as $key) {
+                $row['id'] = $key->id;
+                $row['group'] = "Modal";
+                $row['account_code_id'] = $key->account_code_id;
+                $row['code'] = $key->code;
+                $row['name'] = $key->name;
+                array_push($data, $row);
+            }
+            array_push($group, "Modal");
+           
+        }
+        
+        if($id == 10){
+            $query = DB::table('ml_cost_good_sold')
+                ->where('userid', $user_id)
+                ->get();
+
+            foreach($query as $key) {
+                $row['id'] = $key->id;
+                $row['group'] = "Harga Pokok Penjualan";
+                $row['account_code_id'] = $key->account_code_id;
+                $row['code'] = $key->code;
+                $row['name'] = $key->name;
+                array_push($data, $row);
+            }
+            array_push($group, "Harga Pokok Penjualan");
+           
+        }
+
+        if($id == 10){
+            $query = DB::table('ml_selling_cost')
+                ->where('userid', $user_id)
+                ->get();
+
+            foreach($query as $key) {
+                $row['id'] = $key->id;
+                $row['group'] = "Biaya Penjualan";
+                $row['account_code_id'] = $key->account_code_id;
+                $row['code'] = $key->code;
+                $row['name'] = $key->name;
+                array_push($data, $row);
+            }
+            array_push($group, "Biaya Penjualan");
+        }
+
+        
+
+        if($id == 10){
+            $query = DB::table('ml_admin_general_fees')
+                ->where('userid', $user_id)
+                ->get();
+
+            foreach($query as $key) {
+                $row['id'] = $key->id;
+                $row['group'] = "Biaya Umum Admin";
+                $row['account_code_id'] = $key->account_code_id;
+                $row['code'] = $key->code;
+                $row['name'] = $key->name;
+                array_push($data, $row);
+            }
+            array_push($group, "Biaya Umum Admin");
+        }
+
+        if($id == 1 || $id == 5 || $id == 10){
+            $query = DB::table('ml_non_business_income')
+                ->where('userid', $user_id)
+                ->get();
+
+            foreach($query as $key) {
+                $row['id'] = $key->id;
+                $row['group'] = "Pendapatan Di Luar Usaha";
+                $row['account_code_id'] = $key->account_code_id;
+                $row['code'] = $key->code;
+                $row['name'] = $key->name;
+                array_push($data, $row);
+            }
+            array_push($group, "Pendapatan Di Luar Usaha");
+           
+        }
+
+        
+        if($id == 10){
+            $query = DB::table('ml_non_business_expenses')
+                ->where('userid', $user_id)
+                ->get();
+
+            foreach($query as $key) {
+                $row['id'] = $key->id;
+                $row['group'] = "Biaya Diluar Usaha";
+                $row['account_code_id'] = $key->account_code_id;
+                $row['code'] = $key->code;
+                $row['name'] = $key->name;
+                array_push($data, $row);
+            }
+            array_push($group, "Biaya Diluar Usaha");
+        }
+
+        if($id == 3 || $id == 10){
+            $query = DB::table('ml_longterm_debt')
+                ->where('userid', $user_id)
+                ->get();
+
+            foreach($query as $key) {
+                $row['id'] = $key->id;
+                $row['group'] = "Utang Jangka Panjang";
+                $row['account_code_id'] = $key->account_code_id;
+                $row['code'] = $key->code;
+                $row['name'] = $key->name;
+                array_push($data, $row);
+            }
+            array_push($group, "Utang Jangka Panjang");
+           
+        }
+        // ================== simpan ke==================================
+
+        if($id == 1 || $id == 2 || $id == 3 || $id == 5 || $id == 7 || $id == 9 || $id == 10){
+            $q = DB::table('ml_current_assets')
+                ->where('userid', $user_id);
+            if($id == 5) {
+                $q->where('code', 'piutang-usaha');
+            }
+            
+            $query = $q->get();
+
+            foreach($query as $key) {
+                $row['id'] = $key->id;
+                $row['group'] = "Aktiva Lancar";
+                $row['account_code_id'] = $key->account_code_id;
+                $row['code'] = $key->code;
+                $row['name'] = $key->name;
+                array_push($simpan, $row);
+            }
+            array_push($kelompok, "Aktiva Lancar");
+        }
+
+        if($id == 2 || $id == 3 || $id == 7 || $id == 9 || $id == 10){
+            $query = DB::table('ml_fixed_assets')
+                ->where('userid', $user_id)
+                ->get();
+
+            foreach($query as $key) {
+                $row['id'] = $key->id;
+                $row['group'] = "Aktiva Tetap";
+                $row['account_code_id'] = $key->account_code_id;
+                $row['code'] = $key->code;
+                $row['name'] = $key->name;
+                array_push($simpan, $row);
+            }
+            array_push($kelompok, "Aktiva Tetap");
+        }
+
+        if($id == 10){
+            $query = DB::table('ml_accumulated_depreciation')
+                ->where('userid', $user_id)
+                ->get();
+
+            foreach($query as $key) {
+                $row['id'] = $key->id;
+                $row['group'] = "Akumulasi Penyusutan";
+                $row['account_code_id'] = $key->account_code_id;
+                $row['code'] = $key->code;
+                $row['name'] = $key->name;
+                array_push($simpan, $row);
+            }
+            array_push($kelompok, "Akumulasi Penyusutan");
+        }
+
+        if($id == 10){
+            $query = DB::table('ml_shortterm_debt')
+                ->where('userid', $user_id)
+                ->get();
+
+            foreach($query as $key) {
+                $row['id'] = $key->id;
+                $row['group'] = "Utang Jangka Pendek";
+                $row['account_code_id'] = $key->account_code_id;
+                $row['code'] = $key->code;
+                $row['name'] = $key->name;
+                array_push($simpan, $row);
+            }
+            array_push($kelompok, "Utang Jangka Pendek");
+        }
+
+
+        if($id == 10){
+            $query = DB::table('ml_income')
+                ->where('userid', $user_id)
+                ->get();
+
+            foreach($query as $key) {
+                $row['id'] = $key->id;
+                $row['group'] = "Pendapatan";
+                $row['account_code_id'] = $key->account_code_id;
+                $row['code'] = $key->code;
+                $row['name'] = $key->name;
+                array_push($simpan, $row);
+            }
+            array_push($kelompok, "Pendapatan");
+        }
+
+
+
+        if($id == 1 || $id == 2 || $id == 10){
+            $query = DB::table('ml_cost_good_sold')
+                ->where('userid', $user_id)
+                ->get();
+
+            foreach($query as $key) {
+                $row['id'] = $key->id;
+                $row['group'] = "Harga Pokok Penjualan";
+                $row['account_code_id'] = $key->account_code_id;
+                $row['code'] = $key->code;
+                $row['name'] = $key->name;
+                array_push($simpan, $row);
+            }
+            array_push($kelompok, "Harga Pokok Penjualan");
+        }
+
+        if($id == 2 || $id == 3 || $id == 10){
+            $query = DB::table('ml_selling_cost')
+                ->where('userid', $user_id)
+                ->get();
+
+            foreach($query as $key) {
+                $row['id'] = $key->id;
+                $row['group'] = "Biaya Penjualan";
+                $row['account_code_id'] = $key->account_code_id;
+                $row['code'] = $key->code;
+                $row['name'] = $key->name;
+                array_push($simpan, $row);
+            }
+            array_push($kelompok, "Biaya Penjualan");
+        }
+
+        if($id == 2 || $id == 3 || $id == 10){
+            $query = DB::table('ml_admin_general_fees')
+                ->where('userid', $user_id)
+                ->get();
+
+            foreach($query as $key) {
+                $row['id'] = $key->id;
+                $row['group'] = "Biaya Umum Admin";
+                $row['account_code_id'] = $key->account_code_id;
+                $row['code'] = $key->code;
+                $row['name'] = $key->name;
+                array_push($simpan, $row);
+            }
+            array_push($kelompok, "Biaya Umum Admin");
+        }
+
+        if($id == 10){
+            $query = DB::table('ml_non_business_income')
+                ->where('userid', $user_id)
+                ->get();
+
+            foreach($query as $key) {
+                $row['id'] = $key->id;
+                $row['group'] = "Pendapatan Diluar Usaha";
+                $row['account_code_id'] = $key->account_code_id;
+                $row['code'] = $key->code;
+                $row['name'] = $key->name;
+                array_push($simpan, $row);
+            }
+            array_push($kelompok, "Pendapatan Diluar Usaha");
+        }
+
+        if($id == 2 || $id == 3 || $id == 10){
+            $query = DB::table('ml_non_business_expenses')
+                ->where('userid', $user_id)
+                ->get();
+
+            foreach($query as $key) {
+                $row['id'] = $key->id;
+                $row['group'] = "Biaya Diluar Usaha";
+                $row['account_code_id'] = $key->account_code_id;
+                $row['code'] = $key->code;
+                $row['name'] = $key->name;
+                array_push($simpan, $row);
+            }
+            array_push($kelompok, "Biaya Diluar Usaha");
+        }
+
+        if($id == 8){
+            $query = DB::table('ml_capital')
+                ->where('userid', $user_id)
+                ->get();
+
+            foreach($query as $key) {
+                $row['id'] = $key->id;
+                $row['group'] = "Modal";
+                $row['account_code_id'] = $key->account_code_id;
+                $row['code'] = $key->code;
+                $row['name'] = $key->name;
+                array_push($simpan, $row);
+            }
+            array_push($kelompok, "Modal");
+        }
+
+        if($id == 10){
+            $query = DB::table('ml_longterm_debt')
+                ->where('userid', $user_id)
+                ->get();
+
+            foreach($query as $key) {
+                $row['id'] = $key->id;
+                $row['group'] = "Utang Jangka Panjang";
+                $row['account_code_id'] = $key->account_code_id;
+                $row['code'] = $key->code;
+                $row['name'] = $key->name;
+                array_push($simpan, $row);
+            }
+            array_push($kelompok, "Utang Jangka Panjang");
+        }
+
         return response()->json([
             "data" => $data,
-            "group" => $group
+            "group" => $group,
+            "simpan" => $simpan, 
+            "kelompok" => $kelompok
         ]);
     }
 }

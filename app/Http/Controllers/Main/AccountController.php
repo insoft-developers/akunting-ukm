@@ -350,7 +350,7 @@ class AccountController extends Controller
 			'Biaya Bonus Penjualan',
 			'Biaya Pengiriman',
 			'Biaya Penjualan Lain-Lain',
-			'Pajak Penjualan',
+			'Biaya Pajak Penjualan',
 			'Biaya Iklan',
 			'Biaya Retur Penjualan',
 			'Biaya Kerusakan Barang'

@@ -33,6 +33,7 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('/get_account_receive/{id}', [DashboardController::class, 'get_account_receive']);
+Route::post('/save_jurnal', [DashboardController::class, 'save_jurnal']);
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
