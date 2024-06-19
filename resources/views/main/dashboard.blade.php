@@ -46,11 +46,13 @@
                     <div class="card stretch stretch-full">
                         <div class="card-header">
                             <h5 class="card-title">Kelola Jurnal</h5>
-                            <a href="javascript:void(0);" class="btn btn-sm btn-info pull-right">
-                                <i class="fa fa-plus-square"></i>
+                            
+                            <a href="{{ url('journal_add') }}" class="avatar-text avatar-md bg-default text-white pull-right">
+                                <i class="feather-plus bg-dark"></i>
                             </a>
-                            <a href="javascript:void(0);" onclick="add_jurnal()" class="btn btn-sm btn-primary">
-                                <i class="fa fa-plus-circle"></i>
+
+                            <a href="javascript:void(0);" onclick="add_jurnal()" class="avatar-text avatar-md bg-info text-white pull-right;" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                                <i class="feather-plus"></i>
                             </a>
                             
                             
@@ -98,42 +100,18 @@
                             
                             <div class="mtop50"></div>
                             <div class="table-responsive">
-                                <table class="table table-hover table-bordered mb-0">
+                                <table id="table-jurnal" class="table table-hover table-striped mb-0">
                                     <thead>
                                         <tr class="border-b">
-                                            <th scope="row">Tanggal</th>
-                                            <th>Nama Transaksi</th>
-                                            <th>Nominal</th>
-                                            <th>Dibuat</th>
-                                            <th class="text-end">Opsi</th>
+                                            <th width="0%">ID</th>
+                                            <th width="3%">Tanggal</th>
+                                            <th width="*">Nama Transaksi</th>
+                                            <th width="15%">Nominal</th>
+                                            <th width="15%">Dibuat</th>
+                                            <th width="15%" class="text-end">Opsi</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center gap-3">
-                                                    <div class="avatar-image">
-                                                        <img src="assets/images/avatar/6.png" alt="" class="img-fluid">
-                                                    </div>
-                                                    <a href="javascript:void(0);">
-                                                        <span class="d-block">Valentine Maton</span>
-                                                        <span class="fs-12 d-block fw-normal text-muted">alenine.aton@gmail.com</span>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-gray-200 text-dark">Sent</span>
-                                            </td>
-                                            <td>11/06/2023 10:53</td>
-                                            <td>
-                                                <span class="badge bg-soft-success text-success">Completed</span>
-                                            </td>
-                                            <td class="text-end">
-                                                <a href="javascript:void(0);"><i class="feather-more-vertical"></i></a>
-                                            </td>
-                                        </tr>
-                                    </tbody>
+                                    <tbody></tbody>
                                 </table>
                             </div>
                             <div class="mtop30"></div>

@@ -9,11 +9,40 @@ use DB;
 use Session;
 use Validator;
 use App\Traits\CommonTrait;
+use DataTables;
 
 class DashboardController extends Controller
 {
     use CommonTrait;
+
+    public function journal_add() {
+        $view = 'journal-add';
+        $akun = $this->get_account_select();
+        return view('main.journal_add', compact('view', 'akun'));
+    }
     
+   
+
+    public function journal_table()
+    {
+        $data = DB::table('ml_journal')->where('userid', session('id'))->get();
+        return Datatables::of($data)
+            ->addColumn('dibuat', function($data){
+                return '<center>'.date('d-m-Y', $data->created).'</center>';
+            })
+            ->addColumn('tanggal', function($data){
+                return '<center><div class="date-box" style="background:'.$data->color_date.'">'.date('d', $data->created).'</div></center>';
+            })
+            ->addColumn('nominal', function($data){
+                return '<div sytle="text-align:right";>Rp. '.number_format($data->nominal).'</div>';
+            })
+            ->addColumn('action', function($data){
+                return '<center><button style="width:70px;margin-bottom:5px;" class="btn btn-info btn-sm">Sunting</button><button style="width:70px;" class="btn btn-danger btn-sm">Hapus</button></center>';
+            })
+        ->rawColumns(['action','dibuat','tanggal','nominal'])
+        ->make(true);
+    }
+
 
     public function index() {
         $view = "jurnal";
@@ -629,5 +658,200 @@ class DashboardController extends Controller
             "simpan" => $simpan, 
             "kelompok" => $kelompok
         ]);
+    }
+
+    public function get_account_select() {
+        $data = [];
+        $group = [];
+        
+        $user_id = session('id');
+        $query = DB::table('ml_current_assets')
+            ->where('userid', $user_id)
+            ->get();
+
+        foreach($query as $key) {
+            $row['id'] = $key->id;
+            $row['group'] = "Aktiva Lancar";
+            $row['account_code_id'] = $key->account_code_id;
+            $row['code'] = $key->code;
+            $row['name'] = $key->name;
+            array_push($data, $row);
+        }
+        array_push($group, "Aktiva Lancar");
+    
+
+        $query = DB::table('ml_fixed_assets')
+            ->where('userid', $user_id)
+            ->get();
+
+        foreach($query as $key) {
+            $row['id'] = $key->id;
+            $row['group'] = "Aktiva Tetap";
+            $row['account_code_id'] = $key->account_code_id;
+            $row['code'] = $key->code;
+            $row['name'] = $key->name;
+            array_push($data, $row);
+        }
+        array_push($group, "Aktiva Tetap");
+           
+        $query = DB::table('ml_accumulated_depreciation')
+            ->where('userid', $user_id)
+            ->get();
+
+        foreach($query as $key) {
+            $row['id'] = $key->id;
+            $row['group'] = "Akumulasi Penyusutan";
+            $row['account_code_id'] = $key->account_code_id;
+            $row['code'] = $key->code;
+            $row['name'] = $key->name;
+            array_push($data, $row);
+        }
+        array_push($group, "Akumulasi Penyusutan");
+        
+        
+        $query = DB::table('ml_shortterm_debt')
+            ->where('userid', $user_id)
+            ->get();
+
+        foreach($query as $key) {
+            $row['id'] = $key->id;
+            $row['group'] = "Utang Jangka Pendek";
+            $row['account_code_id'] = $key->account_code_id;
+            $row['code'] = $key->code;
+            $row['name'] = $key->name;
+            array_push($data, $row);
+        }
+        array_push($group, "Utang Jangka Pendek");
+           
+       
+        $query = DB::table('ml_longterm_debt')
+            ->where('userid', $user_id)
+            ->get();
+
+        foreach($query as $key) {
+            $row['id'] = $key->id;
+            $row['group'] = "Utang Jangka Panjang";
+            $row['account_code_id'] = $key->account_code_id;
+            $row['code'] = $key->code;
+            $row['name'] = $key->name;
+            array_push($data, $row);
+        }
+        array_push($group, "Utang Jangka Panjang");
+           
+        $query = DB::table('ml_capital')
+                ->where('userid', $user_id)
+                ->get();
+
+        foreach($query as $key) {
+            $row['id'] = $key->id;
+            $row['group'] = "Modal";
+            $row['account_code_id'] = $key->account_code_id;
+            $row['code'] = $key->code;
+            $row['name'] = $key->name;
+            array_push($data, $row);
+        }
+        array_push($group, "Modal");
+        
+        $query = DB::table('ml_income')
+            ->where('userid', $user_id)
+            ->get();
+
+        foreach($query as $key) {
+            $row['id'] = $key->id;
+            $row['group'] = "Pendapatan";
+            $row['account_code_id'] = $key->account_code_id;
+            $row['code'] = $key->code;
+            $row['name'] = $key->name;
+            array_push($data, $row);
+        }
+        array_push($group, 'Pendapatan');
+        
+       
+        $query = DB::table('ml_cost_good_sold')
+            ->where('userid', $user_id)
+            ->get();
+
+        foreach($query as $key) {
+            $row['id'] = $key->id;
+            $row['group'] = "Harga Pokok Penjualan";
+            $row['account_code_id'] = $key->account_code_id;
+            $row['code'] = $key->code;
+            $row['name'] = $key->name;
+            array_push($data, $row);
+        }
+        array_push($group, "Harga Pokok Penjualan");
+           
+    
+        $query = DB::table('ml_selling_cost')
+            ->where('userid', $user_id)
+            ->get();
+
+        foreach($query as $key) {
+            $row['id'] = $key->id;
+            $row['group'] = "Biaya Penjualan";
+            $row['account_code_id'] = $key->account_code_id;
+            $row['code'] = $key->code;
+            $row['name'] = $key->name;
+            array_push($data, $row);
+        }
+        array_push($group, "Biaya Penjualan");
+        
+        $query = DB::table('ml_admin_general_fees')
+            ->where('userid', $user_id)
+            ->get();
+
+        foreach($query as $key) {
+            $row['id'] = $key->id;
+            $row['group'] = "Biaya Umum Admin";
+            $row['account_code_id'] = $key->account_code_id;
+            $row['code'] = $key->code;
+            $row['name'] = $key->name;
+            array_push($data, $row);
+        }
+        array_push($group, "Biaya Umum Admin");
+        
+      
+        $query = DB::table('ml_non_business_income')
+            ->where('userid', $user_id)
+            ->get();
+
+        foreach($query as $key) {
+            $row['id'] = $key->id;
+            $row['group'] = "Pendapatan Di Luar Usaha";
+            $row['account_code_id'] = $key->account_code_id;
+            $row['code'] = $key->code;
+            $row['name'] = $key->name;
+            array_push($data, $row);
+        }
+        array_push($group, "Pendapatan Di Luar Usaha");
+                   
+      
+        $query = DB::table('ml_non_business_expenses')
+            ->where('userid', $user_id)
+            ->get();
+
+        foreach($query as $key) {
+            $row['id'] = $key->id;
+            $row['group'] = "Biaya Diluar Usaha";
+            $row['account_code_id'] = $key->account_code_id;
+            $row['code'] = $key->code;
+            $row['name'] = $key->name;
+            array_push($data, $row);
+        }
+        array_push($group, "Biaya Diluar Usaha");
+        
+        $data['data'] = $data;
+        $data['group'] = $group;
+
+        return $data;
+    }
+
+    public function journal_multiple_form() {
+        $data = $this->get_account_select();
+        return response()->json([
+            "data" => $data,
+            "success" => true
+        ]);
+    
     }
 }

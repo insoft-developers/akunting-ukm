@@ -25,6 +25,7 @@ $setting = \App\Models\Setting::findorFail(1);
     <link rel="stylesheet" type="text/css" href="{{ asset('template/main') }}/css/bootstrap.min.css" />
     <!--! END: Bootstrap CSS-->
     <!--! BEGIN: Vendors CSS-->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/2.0.8/css/dataTables.bootstrap5.css"/>
     <link rel="stylesheet" type="text/css" href="{{ asset('template/main') }}/vendors/css/select2.min.css">
     <link rel="stylesheet" type="text/css" href="{{ asset('template/main') }}/vendors/css/select2-theme.min.css">
     <link rel="stylesheet" type="text/css" href="{{ asset('template/main') }}/vendors/css/vendors.min.css" />
@@ -340,20 +341,7 @@ $setting = \App\Models\Setting::findorFail(1);
     <!--! ================================================================ !-->
     
     @yield('content')
-    <footer class="footer">
-        <p class="fs-11 text-muted fw-medium text-uppercase mb-0 copyright">
-            <span>Copyright ©</span>
-            <script>
-                document.write(new Date().getFullYear());
-            </script>
-        </p>
-        <div class="d-flex align-items-center gap-4">
-            <a href="javascript:void(0);" class="fs-11 fw-semibold text-uppercase">Help</a>
-            <a href="javascript:void(0);" class="fs-11 fw-semibold text-uppercase">Terms</a>
-            <a href="javascript:void(0);" class="fs-11 fw-semibold text-uppercase">Privacy</a>
-        </div>
-    </footer>
-    <!-- [ Footer ] end -->
+    
 </main>
     <!--! ================================================================ !-->
     <!--! [End] Main Content !-->
@@ -534,6 +522,9 @@ $setting = \App\Models\Setting::findorFail(1);
     <!--! ================================================================ !-->
     <!--! BEGIN: Vendors JS !-->
     <script src="{{ asset('template/main') }}/vendors/js/vendors.min.js"></script>
+
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.bootstrap5.js"></script>
     <!-- vendors.min.js {always must need to be top} -->
     <script src="{{ asset('template/main') }}/vendors/js/select2.min.js"></script>
     <script src="{{ asset('template/main') }}/vendors/js/select2-active.min.js"></script>

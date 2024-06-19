@@ -96,7 +96,34 @@
         padding-top:2px !important;
 
     }
+    .dt-length, .dt-search{
+        display: none;
+    }
 
+    #table-jurnal th {
+        font-size: 12px;
+    }
+    .date-box{
+        
+        width: 50px;
+        padding: 14px 10px 14px 10px;
+        border-radius: 5px;
+        color: white;
+        font-weight: bold;
+    }
+    .del-item{
+        background: darkred;
+        color: white;
+        width: 28px;
+        position: relative;
+        right: -273px;
+        top: -31px;
+    }
+    .del-item:hover{
+        opacity: 0.5 !important;
+        background: orange !important;
+        color: white !important;
+    }
   
 
 </style>

@@ -17,11 +17,19 @@ use App\Http\Controllers\Main\AccountController;
 */
 
 Route::get('/', [DashboardController::class, 'index']);
+Route::get('/journal_table', [DashboardController::class, 'journal_table'])->name('journal.table');
+
 Route::get('/frontend_register', [AccountController::class, 'register']);
 Route::post('/signup', [AccountController::class, 'signup']);
 Route::get('/frontend_login', [AccountController::class, 'login']);
 Route::post('/login_action', [AccountController::class, 'login_action'])->name('login.action');
 Route::get('/frontend_logout', [AccountController::class, 'logout']);
+Route::get('/get_account_receive/{id}', [DashboardController::class, 'get_account_receive']);
+Route::post('/save_jurnal', [DashboardController::class, 'save_jurnal']);
+
+Route::get('journal_add', [DashboardController::class, 'journal_add']);
+Route::get('journal_multiple_form', [DashboardController::class, 'journal_multiple_form']);
+
 
 
 // Route::get('/', function(){
@@ -32,8 +40,7 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/get_account_receive/{id}', [DashboardController::class, 'get_account_receive']);
-Route::post('/save_jurnal', [DashboardController::class, 'save_jurnal']);
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
