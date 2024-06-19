@@ -10,6 +10,7 @@ use Session;
 use Validator;
 use App\Traits\CommonTrait;
 use DataTables;
+use Redirect;
 
 class DashboardController extends Controller
 {
@@ -21,6 +22,193 @@ class DashboardController extends Controller
         return view('main.journal_add', compact('view', 'akun'));
     }
     
+
+    public function save_multiple_journal(Request $request) {
+        $input = $request->all();
+        $rules = array(
+            "akun.*" => "required",
+            "debit.*" => "required_without:kredit.*",
+            "kredit.*" => "required_without:debit.*",
+            "transaction_date" => "required",
+            "transaction_name" => "required",
+        );
+
+        $validator = Validator::make($input, $rules);
+        if($validator->fails()) {
+            $pesan = $validator->errors();
+            $pesanarr = explode(",", $pesan);
+            $find = array("[","]","{","}");
+            $html = '';
+            foreach($pesanarr as $p ) {
+                $n = str_replace($find,"",$p);
+                $o = strstr($n, ':', false);
+                $html .= str_replace(":", "", $o).'<br>';
+            }
+
+            return response()->json([
+            	"success" => false,
+            	"message" => $html
+            ]);
+
+        }
+
+        $nominal = '';
+        if(empty($input['debit'][0])) {
+            $nominal = $input['kredit'][0];
+            $input['debit'][0] = 0;
+
+        }
+        if(empty($input['kredit'][0])) {
+            $nominal = $input['debit'][0];
+            $input['kredit'][0] = 0;
+        } 
+
+        $date = strtotime($input['transaction_date']);
+
+        $get_id_transaction = $this->initTransactionId($input['akun'][0], $input['akun'][1]);
+
+    
+        $data_journal = [
+            'userid'			=> session('id'),
+            'transaction_id'	=> $get_id_transaction,
+            'transaction_name'	=> $this->checkTransactionName($input['transaction_name']),
+            'rf_accode_id'		=> $input['akun'][0],
+            'st_accode_id'		=> $input['akun'][1],
+            'nominal'			=> $nominal,
+            'color_date'		=> $this->get_data_transaction($get_id_transaction, 'color'),
+            'created'			=> $date
+        ];
+
+        // First insert data to journal
+        // $this->db->sql_insert($data_journal, 'ml_journal');
+        $journal_id = DB::table('ml_journal')->insertGetId($data_journal);
+
+        for ($i = 0; $i < count($input['akun']); $i++) 
+        { 
+            
+            $debit = $input['debit'][$i] == null ? 0 : $input['debit'][$i];
+
+            if ($input['akun'][$i] !== '')
+            {
+                $account_code_id = explode("_", $input['akun'][$i]);
+                $asset_data_name = $this->getAllListAssetWithAccDataId(session('id'), $account_code_id[0], $account_code_id[1]);
+            }
+
+            $data_debit = [
+                'journal_id'		=> $journal_id,
+                'rf_accode_id'		=> $input['akun'][$i],
+                'account_code_id'	=> $account_code_id[1],
+                'asset_data_id'		=> $account_code_id[0],
+                'asset_data_name'	=> $asset_data_name,
+                'debet'				=> $debit,
+                'created'			=> $date
+            ];
+
+            // Second insert data to journal list
+            // $this->db->sql_insert($data_debit, 'ml_journal_list');
+            
+            DB::table('ml_journal_list')->insert($data_debit);
+        
+        
+            $credit = $input['kredit'][$i] == null ? 0 : $input['kredit'][$i];
+
+            if ($input['akun'][$i] !== '')
+            {
+                $account_code_id = explode("_", $input['akun'][$i]);
+                $asset_data_name = $this->getAllListAssetWithAccDataId(session('id'), $account_code_id[0], $account_code_id[1]);
+            }
+
+            $data_credit = [
+                'journal_id'		=> $journal_id,
+                'st_accode_id'		=> $input['akun'][$i],
+                'account_code_id'	=> $account_code_id[1],
+                'asset_data_id'		=> $account_code_id[0],
+                'asset_data_name'	=> $asset_data_name,
+                'credit'			=> $credit,
+                'created'			=> $date
+            ];
+
+            // Second insert data to journal list
+            // $this->db->sql_insert($data_credit, 'ml_journal_list');
+            DB::table('ml_journal_list')->insert($data_credit);
+            
+        }
+        
+
+        // if ($this->input->post('status_submit') == 'approved')
+        // {
+        // 	$this->reGenerateOpeningBalance();
+        // }
+
+        // Update total saldo
+        $reCalculateTotalSaldo = $this->checkTotalBalance($journal_id);
+
+        // Second update data to journal
+        // $this->db->sql_update(['total_balance' => $reCalculateTotalSaldo], 'ml_journal', ['id' => $journal_id]);
+        DB::table('ml_journal')->where('id', $journal_id)->update(['total_balance'=> $reCalculateTotalSaldo]);
+
+        return response()->json([
+            "success" => true
+        ]);
+    }
+
+
+    protected function initTransactionId($account_code_id1, $account_code_id2)
+	{
+		$var_rf_cid = explode("_", $account_code_id1);
+		$rf_id 		= $var_rf_cid[0];
+		$rf_code_id = $var_rf_cid[1];
+
+		$var_st_cid = explode("_", $account_code_id2);
+		$st_id 		= $var_st_cid[0];
+		$st_code_id = $var_st_cid[1];
+
+		// $res1 = $this->db->sql_prepare("select * from ml_transaction_subcat where account_code_id = :id and received_from_status = 0 order by id");
+		// $bindParam1 = $this->db->sql_bindParam(['id' => $rf_code_id], $res1);
+		// while ($row1 = $this->db->sql_fetch_single($bindParam1))
+		// {
+		// 	if ($row1['transaction_id'] !== 3 && $row1['transaction_id'] !== 5)
+		// 	{
+		// 		$output1[] = $row1['transaction_id'];
+		// 	}
+		// }
+
+        $row1 = DB::table('ml_transaction_subcat')->where('account_code_id', $rf_code_id)->where('received_from_status', 0)->orderBy('id')->get();
+        foreach($row1 as $rw1) {
+            if ($rw1->transaction_id !== 3 && $rw1->transaction_id !== 5)
+			{
+				$output1[] = $rw1->transaction_id;
+			}
+        }
+
+
+		// $res2 = $this->db->sql_prepare("select * from ml_transaction_subcat where account_code_id = :id and saved_to_status = 0 order by id");
+		// $bindParam2 = $this->db->sql_bindParam(['id' => $st_code_id], $res2);
+		// while ($row2 = $this->db->sql_fetch_single($bindParam2))
+		// {
+		// 	if ($row2['transaction_id'] !== 3 && $row2['transaction_id'] !== 5)
+		// 	{
+		// 		$output2[] = $row2['transaction_id'];
+		// 	}
+		// }
+
+        $row2 = DB::table('ml_transaction_subcat')->where('account_code_id', $st_code_id)->where('saved_to_status', 0)->orderBy('id')->get();
+        foreach($row2 as $rw2) {
+            if ($rw2->transaction_id !== 3 && $rw2->transaction_id !== 5)
+			{
+				$output2[] = $rw2->transaction_id;
+			}
+        }
+
+		$output3 = array_uintersect($output1, $output2, "strcasecmp");
+
+		$k = array_rand($output3);
+		$new_output = $output3[$k];
+
+		return $new_output;
+	}
+
+
    
 
     public function journal_table()
@@ -33,13 +221,13 @@ class DashboardController extends Controller
             ->addColumn('tanggal', function($data){
                 return '<center><div class="date-box" style="background:'.$data->color_date.'">'.date('d', $data->created).'</div></center>';
             })
-            ->addColumn('nominal', function($data){
-                return '<div sytle="text-align:right";>Rp. '.number_format($data->nominal).'</div>';
+            ->addColumn('total_balance', function($data){
+                return '<div sytle="text-align:right";>Rp. '.number_format($data->total_balance).'</div>';
             })
             ->addColumn('action', function($data){
-                return '<center><button style="width:70px;margin-bottom:5px;" class="btn btn-info btn-sm">Sunting</button><button style="width:70px;" class="btn btn-danger btn-sm">Hapus</button></center>';
+                return '<center><a href="'.url('journal_edit/'.$data->id).'"><button style="width:70px;margin-bottom:5px;" class="btn btn-warning btn-sm">Sunting</button></a><button onclick="journal_delete('.$data->id.')" style="width:70px;" class="btn btn-danger btn-sm">Hapus</button></center>';
             })
-        ->rawColumns(['action','dibuat','tanggal','nominal'])
+        ->rawColumns(['action','dibuat','tanggal','total_balance'])
         ->make(true);
     }
 
@@ -213,11 +401,11 @@ class DashboardController extends Controller
 
         $row = DB::table('ml_journal')
             ->where('userid', session('id'))
-            ->where('transaction_name', $transaction_name);
+            ->where('transaction_name', $transaction_name)->get();
             
-
-		if ($row->count()>0)
-		{
+        
+		if ($row->count() > 0)
+    		{
 			$total = $row->count() + 1;
 
 			$output = $transaction_name.' ('.$total.')';
@@ -852,6 +1040,61 @@ class DashboardController extends Controller
             "data" => $data,
             "success" => true
         ]);
-    
+    }
+
+
+    public function journal_edit($id) {
+        $view = 'journal-edit';
+        $akun = $this->get_account_select();
+        $data = DB::table('ml_journal')->where('id', $id)->first();
+        $detail = DB::table('ml_journal_list')->where('journal_id', $id)->get();
+        return view('main.journal_edit', compact('view', 'akun', 'data', 'detail'));
+    }
+
+
+    public function confirm_journal_delete(Request $request) {
+        $input = $request->all();
+
+
+        // $check = $this->db->num_rows("ml_journal", "", ['id' => $id, 'userid' => get_user('id')]);
+
+        $check = DB::table('ml_journal')->where('id', $input['id'])->where('userid', session('id'))->count();
+        
+
+		if ($check)
+		{
+			// $this->db->sql_delete("ml_journal", ['id' => $id, 'userid' => get_user('id')]);
+            DB::table('ml_journal')->where('id', $input['id'])->where('userid', session('id'))->delete();
+			
+			// $res_delete_journallist = $this->db->sql_prepare("select journal_id from ml_journal_list where journal_id = :journal_id");
+			// $bindParam_delete_journallist = $this->db->sql_bindParam(['journal_id' => $id], $res_delete_journallist);
+
+            $row_delete_journallist = DB::table('ml_journal_list')->where('journal_id', $input['id'])->get();
+
+			// while ($row_delete_journallist = $this->db->sql_fetch_single($bindParam_delete_journallist))
+			// {
+			// 	$this->db->sql_delete("ml_journal_list", ['journal_id' => $row_delete_journallist['journal_id']]);
+
+			// }
+
+            
+
+            foreach($row_delete_journallist as $rd) {
+                DB::table('ml_journal_list')->where('journal_id', $rd->journal_id)->delete();
+            }
+
+			return response()->json([
+                "success" => true,
+                "message" => "success"
+            ]);
+		}
+		else
+		{
+			return response()->json([
+                "success" => false,
+                "message" => "failed, no data to delete!"
+            ]);
+		}
+
     }
 }

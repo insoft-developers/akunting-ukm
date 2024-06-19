@@ -14,6 +14,7 @@ $setting = \App\Models\Setting::findorFail(1);
     <meta name="description" content="" />
     <meta name="keyword" content="" />
     <meta name="author" content="theme_ocean" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <!--! The above 6 meta tags *must* come first in the head; any other head content must come *after* these tags !-->
     <!--! BEGIN: Apps Title-->
     <title>{{ $setting->site_name }} - {{ $setting->site_slogan }}</title>
@@ -64,7 +65,7 @@ $setting = \App\Models\Setting::findorFail(1);
                 <ul class="nxl-navbar">
                     
                     <li class="nxl-item nxl-hasmenu">
-                        <a href="javascript:void(0);" class="nxl-link">
+                        <a href="{{ url('/') }}" class="nxl-link">
                             <span class="nxl-micon"><img class="img-menu" src="{{ asset('template/main/images/menu/jurnal.png') }}"></span>
                             <span class="nxl-mtext menu-text">Jurnal</span><br>
                             <span class="nxl-mtext menu-subtitle">Lihat Jurnal</span>
@@ -221,22 +222,7 @@ $setting = \App\Models\Setting::findorFail(1);
             <div class="header-right ms-auto">
                 <div class="d-flex align-items-center">
                     
-                    <div class="nxl-h-item d-none d-sm-flex">
-                        <div class="full-screen-switcher">
-                            <a href="javascript:void(0);" class="nxl-head-link me-0" onclick="$('body').fullScreenHelper('toggle');">
-                                <i class="feather-maximize maximize"></i>
-                                <i class="feather-minimize minimize"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="nxl-h-item dark-light-theme">
-                        <a href="javascript:void(0);" class="nxl-head-link me-0 dark-button">
-                            <i class="feather-moon"></i>
-                        </a>
-                        <a href="javascript:void(0);" class="nxl-head-link me-0 light-button" style="display: none">
-                            <i class="feather-sun"></i>
-                        </a>
-                    </div>
+                   
                    
                     <div class="dropdown nxl-h-item">
                         <a class="nxl-head-link me-3" data-bs-toggle="dropdown" href="#" role="button" data-bs-auto-close="outside">

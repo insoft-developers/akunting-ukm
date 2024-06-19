@@ -124,6 +124,21 @@
         background: orange !important;
         color: white !important;
     }
-  
+    
+    .label-total, .label-debit, .label-kredit {
+        font-weight: bold;
+        margin-left: 14px;
+       
+    }
+    .label-total {
+        float: right;
+    }
+    .card-header {
+        background-color: #2f467a !important;
+        
+    }
+    .card-title {
+        color:white !important;
+    }
 
 </style>

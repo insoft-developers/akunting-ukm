@@ -28,7 +28,10 @@ Route::get('/get_account_receive/{id}', [DashboardController::class, 'get_accoun
 Route::post('/save_jurnal', [DashboardController::class, 'save_jurnal']);
 
 Route::get('journal_add', [DashboardController::class, 'journal_add']);
+Route::get('journal_edit/{id}', [DashboardController::class, 'journal_edit']);
 Route::get('journal_multiple_form', [DashboardController::class, 'journal_multiple_form']);
+Route::post('save_multiple_journal', [DashboardController::class, 'save_multiple_journal']);
+Route::post('confirm_journal_delete', [DashboardController::class, 'confirm_journal_delete']);
 
 
 

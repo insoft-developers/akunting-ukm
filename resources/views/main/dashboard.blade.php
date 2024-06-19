@@ -47,11 +47,11 @@
                         <div class="card-header">
                             <h5 class="card-title">Kelola Jurnal</h5>
                             
-                            <a href="{{ url('journal_add') }}" class="avatar-text avatar-md bg-default text-white pull-right">
+                            <a style="margin-right:-15px;" href="{{ url('journal_add') }}" class="avatar-text avatar-md bg-default text-white pull-right">
                                 <i class="feather-plus bg-dark"></i>
                             </a>
 
-                            <a href="javascript:void(0);" onclick="add_jurnal()" class="avatar-text avatar-md bg-info text-white pull-right;" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                            <a href="javascript:void(0);" onclick="add_jurnal()" class="avatar-text avatar-md bg-dark text-white pull-right;" data-bs-toggle="dropdown" data-bs-auto-close="outside">
                                 <i class="feather-plus"></i>
                             </a>
                             

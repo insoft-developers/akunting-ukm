@@ -14,7 +14,7 @@
                 </div>
                 <ul class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ url('/') }}">Jurnal</a></li>
-                    <li class="breadcrumb-item">Tambah Transaksi</li>
+                    <li class="breadcrumb-item">Sunting Transaksi</li>
                 </ul>
             </div>
             <div class="page-header-right ms-auto">
@@ -42,10 +42,13 @@
         <div class="main-content">
             <div class="row">
                 <!-- [Leads] start -->
+               
                 <div class="col-xxl-8"> 
                     <div class="card stretch stretch-full">
+                       
                         <div class="card-header">
-                            <h5 class="card-title">Tambah Transaksi</h5>
+                            <h5 class="card-title">Sunting Transaksi</h5>
+                            
                 
                             <a href="javascript:void(0);" onclick="add_item()" class="avatar-text avatar-md bg-default text-white pull-right;" data-bs-toggle="dropdown" data-bs-auto-close="outside">
                                 <i class="feather-plus bg-dark"></i>
@@ -58,11 +61,14 @@
                             <div class="card-body custom-card-action p-0">
                                 <div class="container mtop30 main-box">
                                     <div class="row">
+                                        @php
+                                            $tanggal = date('Y-m-d', $data->created);
+                                        @endphp
                                         <div class="col-md-3">
-                                            <input type="date" value="{{ date('Y-m-d') }}" id="transaction_date" name="transaction_date" class="form-control cust-control">   
+                                            <input type="date" value="{{ $tanggal }}" id="transaction_date" name="transaction_date" class="form-control cust-control">   
                                         </div>
                                         <div class="col-md-9">
-                                            <input type="text" class="form-control cust-control" placeholder="Nama Transaksi" id="transaction_name" name="transaction_name">
+                                            <input type="text" value="{{ $data->transaction_name }}" class="form-control cust-control" placeholder="Nama Transaksi" id="transaction_name" name="transaction_name">
                                         </div>
                                     </div>
                                     <div class="mtop20"></div>
