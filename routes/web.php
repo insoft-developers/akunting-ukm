@@ -17,7 +17,7 @@ use App\Http\Controllers\Main\AccountController;
 */
 
 Route::get('/', [DashboardController::class, 'index']);
-Route::get('/journal_table', [DashboardController::class, 'journal_table'])->name('journal.table');
+Route::post('journal_table', [DashboardController::class, 'journal_table'])->name('journal.table');
 
 Route::get('/frontend_register', [AccountController::class, 'register']);
 Route::post('/signup', [AccountController::class, 'signup']);
@@ -32,6 +32,8 @@ Route::get('journal_edit/{id}', [DashboardController::class, 'journal_edit']);
 Route::get('journal_multiple_form', [DashboardController::class, 'journal_multiple_form']);
 Route::post('save_multiple_journal', [DashboardController::class, 'save_multiple_journal']);
 Route::post('confirm_journal_delete', [DashboardController::class, 'confirm_journal_delete']);
+Route::get('get_detail/{id}', [DashboardController::class, 'get_detail']);
+Route::post('journal_update', [DashboardController::class, 'journal_update']);
 
 
 

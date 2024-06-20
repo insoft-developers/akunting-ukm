@@ -56,14 +56,33 @@
                             
                             
                         </div>
-                        <form id="form-tambah-jurnal" method="POST" action="">
+                        @php
+                            $tanggal = date('Y-m-d', $data->created);
+                            $akun1 = $detail[0]->rf_accode_id;
+                            $akun2 = $detail[2]->rf_accode_id;
+                        
+                            $total_item = $detail->count() /2;
+
+                            $debit1 = $detail[0]->debet + $detail[1]->debet;
+                            $kredit1 = $detail[0]->credit + $detail[1]->credit; 
+
+                            $debit2 = $detail[2]->debet + $detail[3]->debet;
+                            $kredit2 = $detail[2]->credit + $detail[3]->credit;
+
+                            // for ($i=0; $i < $total_item; $i++) { 
+                            //     $akun_code[] = $detail[$i]->rf_accode_id;
+                            // }
+
+                            
+                           
+                        @endphp
+                        <form id="form-update-jurnal" method="POST" action="">
                             @csrf
+                            <input type="hidden" id="transaction_id" name="transaction_id" value="{{ Request::segment(2) }}">
                             <div class="card-body custom-card-action p-0">
                                 <div class="container mtop30 main-box">
                                     <div class="row">
-                                        @php
-                                            $tanggal = date('Y-m-d', $data->created);
-                                        @endphp
+                                         
                                         <div class="col-md-3">
                                             <input type="date" value="{{ $tanggal }}" id="transaction_date" name="transaction_date" class="form-control cust-control">   
                                         </div>
@@ -72,16 +91,27 @@
                                         </div>
                                     </div>
                                     <div class="mtop20"></div>
-                                    <div class="row" id="row_1">
+                                    <div class="row">
                                         <div class="col-md-4">
                                             <label>Estimasi</label>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label>Debit</label>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label>Kredit</label>
+                                        </div>
+                                    </div>
+                                    <div class="row" id="row_1">
+                                        <input type="hidden" id="journal_list_id_1" name="journal_list_id[]">
+                                        <div class="col-md-4">
                                             <select class="form-control cust-control" id="akun_1" name="akun[]">
                                                 <option value="">Pilih</option>
                                                 @foreach( $akun['group'] as $a)
                                                     <optgroup label={{ $a }}>
                                                         @foreach($akun['data'] as $i)
                                                             @if($i['group'] == $a)
-                                                            <option value="{{ $i['id'] }}_{{ $i['account_code_id'] }}"><?= $i['name'] ;?></option>
+                                                            <option <?php if($akun1 ==  $i['id'].'_'.$i['account_code_id'] ) echo 'selected' ;?>  value="{{ $i['id'] }}_{{ $i['account_code_id'] }}"><?= $i['name'] ;?></option>
                                                             @endif
                                                         
                                                         @endforeach
@@ -90,16 +120,16 @@
                                             </select>
                                         </div>
                                         <div class="col-md-4">
-                                            <label>Debit</label>
-                                            <input type="number" onkeyup="set_debit(1)" class="form-control cust-control" placeholder="0" id="debit_1" name="debit[]">
+                                            <input type="number" value="{{ $debit1 }}" onkeyup="set_debit(1)" class="form-control cust-control" placeholder="0" id="debit_1" name="debit[]">
                                         </div>
                                         <div class="col-md-4">
-                                            <label>Kredit</label>
-                                            <input type="number" onkeyup="set_kredit(1)" class="form-control cust-control" placeholder="0" id="kredit_1" name="kredit[]">
-                                            <a href="javascript:void(0);" onclick="delete_item(1)" type="button" class="btn btn-sm del-item"><i class="fa fa-remove"></i></a>
+                                            <input type="text" value="{{ $kredit1 }}" onkeyup="set_kredit(1)" class="form-control cust-control" placeholder="0" id="kredit_1" name="kredit[]">
+                                            <button disabled="disabled" href="javascript:void(0);" onclick="delete_item(1)" type="button" class="btn btn-sm del-item"><i class="fa fa-remove"></i></button>
                                         </div>
                                     </div>
+
                                     <div class="row" id="row_2">
+                                        <input type="hidden" id="journal_list_id_2" name="journal_list_id[]">
                                         <div class="col-md-4">
                                         
                                             <select class="form-control cust-control" id="akun_2" name="akun[]">
@@ -108,7 +138,7 @@
                                                     <optgroup label={{ $a }}>
                                                     @foreach($akun['data'] as $i)
                                                         @if($i['group'] == $a)
-                                                        <option value="{{ $i['id'] }}_{{ $i['account_code_id'] }}"><?= $i['name'] ;?></option>
+                                                        <option <?php if($akun2 ==  $i['id'].'_'.$i['account_code_id'] ) echo 'selected' ;?> value="{{ $i['id'] }}_{{ $i['account_code_id'] }}"><?= $i['name'] ;?></option>
                                                     @endif
                                                     
                                                     @endforeach
@@ -119,15 +149,60 @@
 
                                         <div class="col-md-4">
                                             
-                                            <input type="number" onkeyup="set_debit(2)" class="form-control cust-control" placeholder="0" id="debit_2" name="debit[]">
+                                            <input type="number" value="{{ $debit2 }}" onkeyup="set_debit(2)" class="form-control cust-control" placeholder="0" id="debit_2" name="debit[]">
                                         </div>
                                         {{-- {{ dd($akun['group']) }} --}}
                                         <div class="col-md-4">
                                             
-                                            <input type="number" onkeyup="set_kredit(2)" class="form-control cust-control" placeholder="0" id="kredit_2" name="kredit[]">
-                                            <a href="javascript:void(0);" onclick="delete_item(2)" type="button" class="btn btn-sm del-item"><i class="fa fa-remove"></i></a>
+                                            <input type="text" value="{{ $kredit2 }}" onkeyup="set_kredit(2)" class="form-control cust-control" placeholder="0" id="kredit_2" name="kredit[]">
+                                            <button disabled="disabled" href="javascript:void(0);" onclick="delete_item(2)" type="button" class="btn btn-sm del-item"><i class="fa fa-remove"></i></button>
                                         </div>
                                     </div>
+
+                                    @php
+                                    $c=2;
+                                    @endphp
+                                    @for($s=2; $s<$total_item; $s++)
+                                    @php
+                                    $b = +$s + +1;
+                                    $c = +$c + +2;
+                                    $selected_akun = $detail[$c]->rf_accode_id;
+                                    $debits = $detail[$c]->debet + $detail[+$c + +1]->debet;
+                                    $kredits = $detail[$c]->credit + $detail[+$c + +1]->credit;
+                                    
+                                    @endphp
+                                    <div class="row" id="row_{{ $b }}">
+                                        <div class="col-md-4">
+                                        
+                                            <select class="form-control cust-control" id="akun_{{ $b }}" name="akun[]">
+                                                <option value="">Pilih</option>
+                                                @foreach( $akun['group'] as $a)
+                                                    <optgroup label={{ $a }}>
+                                                    @foreach($akun['data'] as $i)
+                                                        @if($i['group'] == $a)
+                                                        <option <?php if($selected_akun ==  $i['id'].'_'.$i['account_code_id'] ) echo 'selected' ;?> value="{{ $i['id'] }}_{{ $i['account_code_id'] }}"><?= $i['name'] ;?></option>
+                                                    @endif
+                                                    
+                                                    @endforeach
+                                                    </optgroup>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            
+                                            <input type="number" value="{{ $debits }}" onkeyup="set_debit({{ $b }})" class="form-control cust-control" placeholder="0" id="debit_{{ $b }}" name="debit[]">
+                                        </div>
+                                        {{-- {{ dd($akun['group']) }} --}}
+                                        <div class="col-md-4">
+                                            
+                                            <input type="number" value="{{ $kredits }}" onkeyup="set_kredit(2)" class="form-control cust-control" placeholder="0" id="kredit_{{ $b }}" name="kredit[]">
+                                            <a href="javascript:void(0);" onclick="delete_item({{ $b }})" type="button" class="btn btn-sm del-item"><i class="fa fa-remove"></i></a>
+                                        </div>
+                                    </div>
+                                    @endfor
+                                   
+
                                     <div id="input_add_container"></div>
                                     <div class="mtop20"></div>
                                     <hr />

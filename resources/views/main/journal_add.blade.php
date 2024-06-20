@@ -66,9 +66,20 @@
                                         </div>
                                     </div>
                                     <div class="mtop20"></div>
-                                    <div class="row" id="row_1">
+                                    <div class="row">
                                         <div class="col-md-4">
                                             <label>Estimasi</label>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label>Debit</label>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label>Kredit</label>
+                                        </div>
+                                    </div>
+                                    <div class="row" id="row_1">
+                                        <div class="col-md-4">
+                                            
                                             <select class="form-control cust-control" id="akun_1" name="akun[]">
                                                 <option value="">Pilih</option>
                                                 @foreach( $akun['group'] as $a)
@@ -84,11 +95,11 @@
                                             </select>
                                         </div>
                                         <div class="col-md-4">
-                                            <label>Debit</label>
+                                            
                                             <input type="number" onkeyup="set_debit(1)" class="form-control cust-control" placeholder="0" id="debit_1" name="debit[]">
                                         </div>
                                         <div class="col-md-4">
-                                            <label>Kredit</label>
+                                           
                                             <input type="number" onkeyup="set_kredit(1)" class="form-control cust-control" placeholder="0" id="kredit_1" name="kredit[]">
                                             <a href="javascript:void(0);" onclick="delete_item(1)" type="button" class="btn btn-sm del-item"><i class="fa fa-remove"></i></a>
                                         </div>

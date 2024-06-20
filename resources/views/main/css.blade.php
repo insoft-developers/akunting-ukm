@@ -80,6 +80,7 @@
         height: 36px;
         padding-top: 0;
         padding-bottom: 0;
+        border-radius: 2px !important;
     }
 
     .page-header{
@@ -118,6 +119,7 @@
         position: relative;
         right: -273px;
         top: -31px;
+        
     }
     .del-item:hover{
         opacity: 0.5 !important;

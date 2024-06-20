@@ -7,9 +7,9 @@
             @csrf
             <div class="modal-header" style="background-color: #2f467a;">
               <h5 class="modal-title" style="color:white;">Transaksi Baru</h5>
-              <a href="javascript:void(0);" class="btn btn-sm btn-info">
-                <i class="fa fa-plus-square"></i>
-            </a>
+              <a style="margin-right:-15px;" href="{{ url('journal_add') }}" class="avatar-text avatar-md bg-default text-white">
+                <i class="feather-plus bg-dark"></i>
+              </a>
             </div>
             <div class="modal-body">
               <div class="row">
