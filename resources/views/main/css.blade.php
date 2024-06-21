@@ -103,7 +103,14 @@
 
     #table-jurnal th {
         font-size: 12px;
+        border-bottom: 2px solid black;
     }
+    
+    #table-profit-loss td, #table-profit-loss th {
+        padding-top: 3px;
+        padding-bottom: 3px;
+    }
+
     .date-box{
         
         width: 50px;
@@ -142,5 +149,28 @@
     .card-title {
         color:white !important;
     }
+    .report-menu-title{
+        font-size: 15px;
+    }
+
+    .report-menu-subtitle{
+        font-size: 12px;
+        color: darkgrey;
+    }
+    .menu-report-row {
+        padding-top: 15px !important;
+        padding-bottom: 15px !important;
+        cursor:pointer !important;
+    }
+    .stanggal-text{
+        font-weight: 600;
+        display: block;
+        margin-top: 6px;
+        text-align: center;
+    }
+    #btn-submit-profit-loss{    
+        height: 34px;
+    }
+
 
 </style>

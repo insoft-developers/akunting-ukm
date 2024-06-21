@@ -580,7 +580,51 @@
 </script>
 @endif
 
+@if($view == 'opening-balance')
+<script>
 
+    $("#form-opening-balance").submit(function(e){
+        e.preventDefault();
+        $.ajax({
+            url :"{{ url('submit_opening_balance') }}",
+            dataType: "JSON",
+            type: "POST",
+            data: $(this).serialize(),
+            success: function(data) {
+                console.log(data);
+            }
+        });
+    })
+</script>
+@endif
+
+@if($view == 'profit-loss')
+<script>
+
+    $("#form-profit-loss-submit").submit(function(e){
+        e.preventDefault();
+        $.ajax({
+            url: "{{ url('submit_profit_loss') }}",
+            type: "POST",
+            dataType: "JSON",
+            data: $(this).serialize(),
+            success: function(data) {
+                console.log(data);
+                if(data.success) {
+                    $(".table-responsive").html("");
+                } else {
+                    Swal.fire({
+                        title: "Failed!",
+                        text: data.message,
+                        icon: "error"
+                    });
+                }
+            }
+        })
+    }); 
+
+</script>
+@endif
 
 
 

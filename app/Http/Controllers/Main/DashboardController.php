@@ -85,60 +85,51 @@ class DashboardController extends Controller
 
         for ($i = 0; $i < count($input['akun']); $i++) 
         { 
-            
-            $debit = $input['debit'][$i] == null ? 0 : $input['debit'][$i];
+            if(! empty($input['debit'][$i])) {
+                $debit = $input['debit'][$i] == null ? 0 : $input['debit'][$i];
 
-            if ($input['akun'][$i] !== '')
-            {
-                $account_code_id = explode("_", $input['akun'][$i]);
-                $asset_data_name = $this->getAllListAssetWithAccDataId(session('id'), $account_code_id[0], $account_code_id[1]);
+                if ($input['akun'][$i] !== '')
+                {
+                    $account_code_id = explode("_", $input['akun'][$i]);
+                    $asset_data_name = $this->getAllListAssetWithAccDataId(session('id'), $account_code_id[0], $account_code_id[1]);
+                }
+
+                $data_debit = [
+                    'journal_id'		=> $journal_id,
+                    'rf_accode_id'		=> $input['akun'][$i],
+                    'account_code_id'	=> $account_code_id[1],
+                    'asset_data_id'		=> $account_code_id[0],
+                    'asset_data_name'	=> $asset_data_name,
+                    'debet'				=> $debit,
+                    'created'			=> $date
+                ];                
+                DB::table('ml_journal_list')->insert($data_debit);
             }
 
-            $data_debit = [
-                'journal_id'		=> $journal_id,
-                'rf_accode_id'		=> $input['akun'][$i],
-                'account_code_id'	=> $account_code_id[1],
-                'asset_data_id'		=> $account_code_id[0],
-                'asset_data_name'	=> $asset_data_name,
-                'debet'				=> $debit,
-                'created'			=> $date
-            ];
-
-            // Second insert data to journal list
-            // $this->db->sql_insert($data_debit, 'ml_journal_list');
             
-            DB::table('ml_journal_list')->insert($data_debit);
-        
-        
-            $credit = $input['kredit'][$i] == null ? 0 : $input['kredit'][$i];
+            if(! empty($input['kredit'][$i])) {
+                $credit = $input['kredit'][$i] == null ? 0 : $input['kredit'][$i];
 
-            if ($input['akun'][$i] !== '')
-            {
-                $account_code_id = explode("_", $input['akun'][$i]);
-                $asset_data_name = $this->getAllListAssetWithAccDataId(session('id'), $account_code_id[0], $account_code_id[1]);
+                if ($input['akun'][$i] !== '')
+                {
+                    $account_code_id = explode("_", $input['akun'][$i]);
+                    $asset_data_name = $this->getAllListAssetWithAccDataId(session('id'), $account_code_id[0], $account_code_id[1]);
+                }
+
+                $data_credit = [
+                    'journal_id'		=> $journal_id,
+                    'st_accode_id'		=> $input['akun'][$i],
+                    'account_code_id'	=> $account_code_id[1],
+                    'asset_data_id'		=> $account_code_id[0],
+                    'asset_data_name'	=> $asset_data_name,
+                    'credit'			=> $credit,
+                    'created'			=> $date
+                ];
+                DB::table('ml_journal_list')->insert($data_credit);
             }
-
-            $data_credit = [
-                'journal_id'		=> $journal_id,
-                'st_accode_id'		=> $input['akun'][$i],
-                'account_code_id'	=> $account_code_id[1],
-                'asset_data_id'		=> $account_code_id[0],
-                'asset_data_name'	=> $asset_data_name,
-                'credit'			=> $credit,
-                'created'			=> $date
-            ];
-
-            // Second insert data to journal list
-            // $this->db->sql_insert($data_credit, 'ml_journal_list');
-            DB::table('ml_journal_list')->insert($data_credit);
-            
+        
         }
-        
-
-        // if ($this->input->post('status_submit') == 'approved')
-        // {
-        // 	$this->reGenerateOpeningBalance();
-        // }
+     
 
         // Update total saldo
         $reCalculateTotalSaldo = $this->checkTotalBalance($journal_id);
@@ -252,6 +243,8 @@ class DashboardController extends Controller
         $list_transaksi = MlTransaction::orderBy('id', 'asc')->get();
         return view('main.dashboard', compact('view','list_transaksi'));
     }
+
+
 
     public function save_jurnal(Request $request) {
         $input = $request->all();
@@ -1193,69 +1186,55 @@ class DashboardController extends Controller
         for ($i = 0; $i < count($input['akun']); $i++) 
         { 
             
-            $debit = $input['debit'][$i] == null ? 0 : $input['debit'][$i];
-
-            if ($input['akun'][$i] !== '')
-            {
-                $account_code_id = explode("_", $input['akun'][$i]);
-                $asset_data_name = $this->getAllListAssetWithAccDataId(session('id'), $account_code_id[0], $account_code_id[1]);
-            }
-
-            $data_debit = [
-                'journal_id'		=> $journal_id,
-                'rf_accode_id'		=> $input['akun'][$i],
-                'account_code_id'	=> $account_code_id[1],
-                'asset_data_id'		=> $account_code_id[0],
-                'asset_data_name'	=> $asset_data_name,
-                'debet'				=> $debit,
-                'created'			=> $date
-            ];
-
-            // Second insert data to journal list
-            // $this->db->sql_insert($data_debit, 'ml_journal_list');
-            
-            DB::table('ml_journal_list')->insert($data_debit);
         
-        
-            $credit = $input['kredit'][$i] == null ? 0 : $input['kredit'][$i];
+            if(! empty($input['debit'][$i])) {
+                $debit = $input['debit'][$i] == null ? 0 : $input['debit'][$i];
 
-            if ($input['akun'][$i] !== '')
-            {
-                $account_code_id = explode("_", $input['akun'][$i]);
-                $asset_data_name = $this->getAllListAssetWithAccDataId(session('id'), $account_code_id[0], $account_code_id[1]);
+                if ($input['akun'][$i] !== '')
+                {
+                    $account_code_id = explode("_", $input['akun'][$i]);
+                    $asset_data_name = $this->getAllListAssetWithAccDataId(session('id'), $account_code_id[0], $account_code_id[1]);
+                }
+
+                $data_debit = [
+                    'journal_id'		=> $journal_id,
+                    'rf_accode_id'		=> $input['akun'][$i],
+                    'account_code_id'	=> $account_code_id[1],
+                    'asset_data_id'		=> $account_code_id[0],
+                    'asset_data_name'	=> $asset_data_name,
+                    'debet'				=> $debit,
+                    'created'			=> $date
+                ];
+                
+                DB::table('ml_journal_list')->insert($data_debit);
             }
-
-            $data_credit = [
-                'journal_id'		=> $journal_id,
-                'st_accode_id'		=> $input['akun'][$i],
-                'account_code_id'	=> $account_code_id[1],
-                'asset_data_id'		=> $account_code_id[0],
-                'asset_data_name'	=> $asset_data_name,
-                'credit'			=> $credit,
-                'created'			=> $date
-            ];
-
-            // Second insert data to journal list
-            // $this->db->sql_insert($data_credit, 'ml_journal_list');
-            DB::table('ml_journal_list')->insert($data_credit);
             
+            if(! empty($input['kredit'][$i])) {
+                $credit = $input['kredit'][$i] == null ? 0 : $input['kredit'][$i];
+
+                if ($input['akun'][$i] !== '')
+                {
+                    $account_code_id = explode("_", $input['akun'][$i]);
+                    $asset_data_name = $this->getAllListAssetWithAccDataId(session('id'), $account_code_id[0], $account_code_id[1]);
+                }
+
+                $data_credit = [
+                    'journal_id'		=> $journal_id,
+                    'st_accode_id'		=> $input['akun'][$i],
+                    'account_code_id'	=> $account_code_id[1],
+                    'asset_data_id'		=> $account_code_id[0],
+                    'asset_data_name'	=> $asset_data_name,
+                    'credit'			=> $credit,
+                    'created'			=> $date
+                ];
+                DB::table('ml_journal_list')->insert($data_credit);
+            }    
         }
-        
-
-        // if ($this->input->post('status_submit') == 'approved')
-        // {
-        // 	$this->reGenerateOpeningBalance();
-        // }
-
-        // Update total saldo
+       
         $reCalculateTotalSaldo = $this->checkTotalBalance($journal_id);
 
-        // Second update data to journal
-        // $this->db->sql_update(['total_balance' => $reCalculateTotalSaldo], 'ml_journal', ['id' => $journal_id]);
         DB::table('ml_journal')->where('id', $journal_id)->update(['total_balance'=> $reCalculateTotalSaldo]);
         
-
-
         return response()->json([
             "success"=>true,
             "message" => "success"

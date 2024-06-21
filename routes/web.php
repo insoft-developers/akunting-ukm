@@ -4,6 +4,8 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Main\DashboardController;
 use App\Http\Controllers\Main\AccountController;
+use App\Http\Controllers\Main\ReportController;
+use App\Http\Controllers\Main\SettingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,6 +36,14 @@ Route::post('save_multiple_journal', [DashboardController::class, 'save_multiple
 Route::post('confirm_journal_delete', [DashboardController::class, 'confirm_journal_delete']);
 Route::get('get_detail/{id}', [DashboardController::class, 'get_detail']);
 Route::post('journal_update', [DashboardController::class, 'journal_update']);
+
+Route::get('report', [ReportController::class, 'index']);
+Route::get('profit_loss', [ReportController::class, 'profit_loss']);
+
+Route::get('setting', [SettingController::class,'index']);
+Route::get('generate_opening_balance', [SettingController::class, 'generate_opening_balance']);
+Route::post('submit_opening_balance', [SettingController::class, 'submit_opening_balance']);
+Route::post('submit_profit_loss', [ReportController::class, 'submit_profit_loss']);
 
 
 

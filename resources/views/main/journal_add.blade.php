@@ -83,7 +83,7 @@
                                             <select class="form-control cust-control" id="akun_1" name="akun[]">
                                                 <option value="">Pilih</option>
                                                 @foreach( $akun['group'] as $a)
-                                                    <optgroup label={{ $a }}>
+                                                    <optgroup label="{{ $a }}">
                                                         @foreach($akun['data'] as $i)
                                                             @if($i['group'] == $a)
                                                             <option value="{{ $i['id'] }}_{{ $i['account_code_id'] }}"><?= $i['name'] ;?></option>
@@ -110,7 +110,7 @@
                                             <select class="form-control cust-control" id="akun_2" name="akun[]">
                                                 <option value="">Pilih</option>
                                                 @foreach( $akun['group'] as $a)
-                                                    <optgroup label={{ $a }}>
+                                                    <optgroup label="{{ $a }}">
                                                     @foreach($akun['data'] as $i)
                                                         @if($i['group'] == $a)
                                                         <option value="{{ $i['id'] }}_{{ $i['account_code_id'] }}"><?= $i['name'] ;?></option>

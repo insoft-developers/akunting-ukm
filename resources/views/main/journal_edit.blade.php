@@ -58,16 +58,16 @@
                         </div>
                         @php
                             $tanggal = date('Y-m-d', $data->created);
-                            $akun1 = $detail[0]->rf_accode_id;
-                            $akun2 = $detail[2]->rf_accode_id;
+                            $akun1 = empty($detail[0]->rf_accode_id) ? $detail[0]->st_accode_id : $detail[0]->rf_accode_id;
+                            $akun2 = empty($detail[1]->rf_accode_id) ? $detail[1]->st_accode_id : $detail[1]->rf_accode_id;
                         
-                            $total_item = $detail->count() /2;
+                            $total_item = $detail->count();
 
-                            $debit1 = $detail[0]->debet + $detail[1]->debet;
-                            $kredit1 = $detail[0]->credit + $detail[1]->credit; 
+                            $debit1 = $detail[0]->debet;
+                            $kredit1 = $detail[0]->credit; 
 
-                            $debit2 = $detail[2]->debet + $detail[3]->debet;
-                            $kredit2 = $detail[2]->credit + $detail[3]->credit;
+                            $debit2 = $detail[1]->debet;
+                            $kredit2 = $detail[1]->credit;
 
                             // for ($i=0; $i < $total_item; $i++) { 
                             //     $akun_code[] = $detail[$i]->rf_accode_id;
@@ -160,15 +160,15 @@
                                     </div>
 
                                     @php
-                                    $c=2;
+                                    
                                     @endphp
                                     @for($s=2; $s<$total_item; $s++)
                                     @php
                                     $b = +$s + +1;
-                                    $c = +$c + +2;
-                                    $selected_akun = $detail[$c]->rf_accode_id;
-                                    $debits = $detail[$c]->debet + $detail[+$c + +1]->debet;
-                                    $kredits = $detail[$c]->credit + $detail[+$c + +1]->credit;
+                                   
+                                    $selected_akun = empty($detail[$s]->rf_accode_id) ? $detail[$s]->st_accode_id : $detail[$s]->rf_accode_id;
+                                    $debits = $detail[$s]->debet;
+                                    $kredits = $detail[$s]->credit;
                                     
                                     @endphp
                                     <div class="row" id="row_{{ $b }}">

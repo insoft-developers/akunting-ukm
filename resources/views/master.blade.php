@@ -74,7 +74,7 @@ $setting = \App\Models\Setting::findorFail(1);
                     </li>
                    
                     <li class="nxl-item nxl-hasmenu">
-                        <a href="javascript:void(0);" class="nxl-link">
+                        <a href="{{ url('report') }}" class="nxl-link">
                             <span class="nxl-micon"><img class="img-menu" src="{{ asset('template/main/images/menu/laporan.png') }}"></span>
                             <span class="nxl-mtext menu-text">Laporan</span><br>
                             <span class="nxl-mtext menu-subtitle">Lihat Laporan</span>
@@ -147,7 +147,7 @@ $setting = \App\Models\Setting::findorFail(1);
                         </ul>
                     </li>
                     <li class="nxl-item nxl-hasmenu">
-                        <a href="javascript:void(0);" class="nxl-link">
+                        <a href="{{ url('setting') }}" class="nxl-link">
                             <span class="nxl-micon"><img class="img-menu" src="{{ asset('template/main/images/menu/pengaturan.png') }}"></span>
                             <span class="nxl-mtext menu-text">Pengaturan</span><br>
                             <span class="nxl-mtext menu-subtitle">Pengaturan Perusahaan</span>
