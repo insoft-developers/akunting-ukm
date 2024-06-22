@@ -611,7 +611,36 @@
             success: function(data) {
                 console.log(data);
                 if(data.success) {
-                    $(".table-responsive").html("");
+                    $(".table-responsive").html(data.data);
+                } else {
+                    Swal.fire({
+                        title: "Failed!",
+                        text: data.message,
+                        icon: "error"
+                    });
+                }
+            }
+        })
+    }); 
+
+</script>
+@endif
+
+
+@if($view == 'balance-sheet')
+<script>
+
+    $("#form-balance-sheet-submit").submit(function(e){
+        e.preventDefault();
+        $.ajax({
+            url: "{{ url('submit_balance_sheet') }}",
+            type: "POST",
+            dataType: "JSON",
+            data: $(this).serialize(),
+            success: function(data) {
+                console.log(data);
+                if(data.success) {
+                    $(".table-responsive").html(data.data);
                 } else {
                     Swal.fire({
                         title: "Failed!",

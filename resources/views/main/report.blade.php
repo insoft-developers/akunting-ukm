@@ -68,7 +68,7 @@
                                         <td class="menu-report-row"><a href="{{ url('profit_loss') }}"><strong><span class="report-menu-title">Laba Rugi</span></strong><br><span class="report-menu-subtitle">Laporan dalam bentuk Laba Rugi</span></a></td>
                                     </tr>
                                     <tr>
-                                        <td class="menu-report-row"><strong><span class="report-menu-title">Neraca</span></strong><br><span class="report-menu-subtitle">Laporan dalam bentuk Neraca</span></td>
+                                        <td class="menu-report-row"><a href="{{ url('balance') }}"><strong><span class="report-menu-title">Neraca</span></strong><br><span class="report-menu-subtitle">Laporan dalam bentuk Neraca</span></a></td>
                                     </tr>
                                     <tr>
                                         <td class="menu-report-row"><strong><span class="report-menu-title">Periode</span></strong><br><span class="report-menu-subtitle">Melihat Laporan berdasarkan Periode</span></td>

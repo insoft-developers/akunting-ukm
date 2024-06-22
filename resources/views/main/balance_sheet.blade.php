@@ -13,8 +13,8 @@
                     <h5 class="m-b-10"></h5>
                 </div>
                 <ul class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ url('report') }}">Laporan</a></li>
-                    <li class="breadcrumb-item">Laba Rugi</li>
+                    <li class="breadcrumb-item"><a href=" {{url('report')}} ">Laporan</a></li>
+                    <li class="breadcrumb-item">Neraca</li>
                 </ul>
             </div>
             <div class="page-header-right ms-auto">
@@ -45,7 +45,7 @@
                 <div class="col-xxl-8"> 
                     <div class="card stretch stretch-full">
                         <div class="card-header">
-                            <h5 class="card-title">Laba Rugi</h5>
+                            <h5 class="card-title">Neraca</h5>
                             @php
                                 $bulan_ini = date('F');
                                 $tahun_ini = date('Y');
@@ -57,7 +57,7 @@
                         </div>    
                         <div class="card-body custom-card-action p-0">
                             <div class="container mtop30 main-box">
-                                <form id="form-profit-loss-submit" method="POST">
+                                <form id="form-balance-sheet-submit" method="POST">
                                     @csrf
                                 <div class="row">
                                     <div class="col-md-2">
@@ -135,184 +135,167 @@
                                             <table class="table table-bordered" id="table-profit-loss">
                                                 <tr>
                                                     <th rowspan="2"><center>Keterangan</center></th>
-                                                    <th colspan="2"><center>{{ date('F Y') }}</center></th>    
+                                                    <th colspan="2"><center> {{ date('F Y') }}</center></th>    
                                                 </tr> 
                                                 <tr>
                                                     <th>*</th>
                                                     <th>*</th>
                                                 </tr>
-                                                <tr><td colspan="3" style="border-top:2px solid black;"><strong>Pendapatan</strong></td></tr>
+                                                <tr><td colspan="3" style="border-top:2px solid black;"><strong>Aktiva Lancar</strong></td></tr>
                                                 @php
-                                                 $total_income = 0;
+                                                $total_income =0;
+
+                                                 $total_lancar = 0;
                                                 @endphp
-                                                @foreach($data['income'] as $i)
+                                                @foreach($dt['aktiva_lancar'] as $i)
                                                 @php
-                                                    $income = DB::table('ml_journal_list')
+                                                    $lancar = DB::table('ml_journal_list')
                                                         ->where('asset_data_id', $i->id)
-                                                        ->where('account_code_id', 7)
+                                                        ->where('account_code_id', 1)
                                                         ->where('created', '>=', $awal)
                                                         ->where('created', '<=', $akhir)
-                                                        ->sum(\DB::raw('credit - debet'));
-                                                    $total_income = $total_income + $income;
+                                                        ->sum(\DB::raw('debet - credit'));
+                                                    $total_lancar = $total_lancar + $lancar;
                                                 @endphp
                                                 <tr>
-                                                    <td>&nbsp;&nbsp;&nbsp;&nbsp;{{ $i->name }}</td>
-                                                    <td style="text-align:right;">{{ number_format($income) }}</td>
+                                                    <td>&nbsp;&nbsp;&nbsp;&nbsp; {{$i->name}} </td>
+                                                    <td style="text-align:right;"> {{number_format($lancar)}} </td>
                                                     <td></td>
                                                 </tr>
                                                 @endforeach
                                                 <tr>
-                                                    <td><strong>Pendapatan Bersih</strong></td>
+                                                    <td><strong>Total Aktiva Lancar</strong></td>
                                                     <td></td>
-                                                    <td style="text-align:right;">{{ number_format($total_income) }}</td>
+                                                    <td style="text-align:right;"> {{number_format($total_lancar)}} </td>
                                                 </tr>
-                                                <tr><td colspan="3"><strong>Harga Pokok Penjualan</strong></td></tr>
+                                                <tr><td colspan="3"><strong>Aktiva Tetap</strong></td></tr>
                                                 @php
                                                  $total_hpp = 0;
+                                                 $total_tetap = 0;
                                                 @endphp
-                                                @foreach($data['hpp'] as $a)
+                                                @foreach($dt['aktiva_tetap'] as $a)
                                                 @php
-                                                    $hpp = DB::table('ml_journal_list')
+                                                    $tetap = DB::table('ml_journal_list')
                                                         ->where('asset_data_id', $a->id)
-                                                        ->where('account_code_id', 8)
+                                                        ->where('account_code_id', 2)
                                                         ->where('created', '>=', $awal)
                                                         ->where('created', '<=', $akhir)
                                                         ->sum(\DB::raw('debet-credit'));
-                                                    $total_hpp = $total_hpp + $hpp;
+                                                    $total_tetap = $total_tetap + $tetap;
                                                 @endphp
                                                 <tr>
-                                                    <td>&nbsp;&nbsp;&nbsp;&nbsp;{{ $a->name }}</td>
-                                                    <td style="text-align:right;">({{ number_format($hpp) }})</td>
+                                                    <td>&nbsp;&nbsp;&nbsp;&nbsp; {{$a->name}} </td>
+                                                    <td style="text-align:right;">{{number_format($tetap)}} </td>
                                                     <td></td>
                                                 </tr>
                                                 @endforeach
                                                 <tr>
-                                                    <td><strong>Total Harga Pokok Penjualan</strong></td>
+                                                    <td><strong>Total Aktiva Tetap</strong></td>
                                                     <td></td>
-                                                    <td style="text-align:right;">({{ number_format($total_hpp) }})</td>
+                                                    <td style="text-align:right;">{{number_format($total_tetap)}}</td>
                                                 </tr>
                                                 @php
                                                     $laba_rugi_kotor = $total_income - $total_hpp;
+
+                                                    $total_aktiva = $total_lancar + $total_tetap;
                                                 @endphp
                                                 <tr>
-                                                    <td><strong>LABA/RUGI KOTOR</strong></td>
+                                                    <td><strong>TOTAL AKTIVA</strong></td>
                                                     <td></td>
-                                                    <td style="text-align:right;"><strong>{{ number_format($laba_rugi_kotor) }}</strong></td>
+                                                    <td style="text-align:right;"><strong> {{number_format($total_aktiva)}} </strong></td>
                                                 </tr>
-                                                <tr><td colspan="3"><strong>Biaya Penjualan</strong></td></tr>
+                                                <tr><td colspan="3"><strong>Utang Jangka Pendek</strong></td></tr>
                                                 @php
                                                  $total_selling_cost = 0;
-                                                @endphp
-                                                @foreach($data['selling_cost'] as $a)
-                                                @php
-                                                    $selling_cost = DB::table('ml_journal_list')
-                                                        ->where('asset_data_id', $a->id)
-                                                        ->where('account_code_id', 9)
-                                                        ->where('created', '>=', $awal)
-                                                        ->where('created', '<=', $akhir)
-                                                        ->sum(\DB::raw('debet-credit'));
-                                                    $total_selling_cost = $total_selling_cost + $selling_cost;
-                                                @endphp
-                                                <tr>
-                                                    <td>&nbsp;&nbsp;&nbsp;&nbsp;{{ $a->name }}</td>
-                                                    <td style="text-align:right;">({{ number_format($selling_cost) }})</td>
-                                                    <td></td>
-                                                </tr>
-                                                
-                                                @endforeach
-                                                <tr>
-                                                    <td><strong>Total Biaya Penjualan</strong></td>
-                                                    <td></td>
-                                                    <td style="text-align:right;">({{ number_format($total_selling_cost) }})</td>
-                                                </tr>
-                                                <tr><td colspan="3"><strong>Biaya Umum Admin</strong></td></tr>
-                                                @php
-                                                $total_general_fees = 0;
-                                                @endphp
-                                                @foreach($data['general_fees'] as $a)
-                                                @php
-                                                    $general_fees = DB::table('ml_journal_list')
-                                                        ->where('asset_data_id', $a->id)
-                                                        ->where('account_code_id', 10)
-                                                        ->where('created', '>=', $awal)
-                                                        ->where('created', '<=', $akhir)
-                                                        ->sum(\DB::raw('debet-credit'));
-                                                    $total_general_fees = $total_general_fees + $general_fees;
-                                                @endphp
-                                                <tr>
-                                                    <td>&nbsp;&nbsp;&nbsp;&nbsp;{{ $a->name }}</td>
-                                                    <td style="text-align:right;">({{ number_format($general_fees) }})</td>
-                                                    <td></td>
-                                                </tr>
-                                                
-                                                @endforeach
-                                                <tr>
-                                                    <td><strong>Total Biaya Admin dan Umum</strong></td>
-                                                    <td></td>
-                                                    <td style="text-align:right;">({{ number_format($total_general_fees) }})</td>
-                                                </tr>
 
-                                                <tr><td colspan="3"><strong>Pendapatan Diluar Usaha</strong></td></tr>
-                                                @php
-                                                $total_nb_income = 0;
+                                                 $total_pendek = 0;
                                                 @endphp
-                                                @foreach($data['non_business_income'] as $a)
+                                                @foreach($dt['utang_pendek'] as $a)
                                                 @php
-                                                    $nb_income = DB::table('ml_journal_list')
+                                                    $pendek = DB::table('ml_journal_list')
                                                         ->where('asset_data_id', $a->id)
-                                                        ->where('account_code_id', 11)
+                                                        ->where('account_code_id', 4)
                                                         ->where('created', '>=', $awal)
                                                         ->where('created', '<=', $akhir)
                                                         ->sum(\DB::raw('credit-debet'));
-                                                    $total_nb_income = $total_nb_income + $nb_income;
+                                                    $total_pendek = $total_pendek + $pendek;
                                                 @endphp
                                                 <tr>
-                                                    <td>&nbsp;&nbsp;&nbsp;&nbsp;{{ $a->name }}</td>
-                                                    <td style="text-align:right;">{{ number_format($nb_income) }}</td>
+                                                    <td>&nbsp;&nbsp;&nbsp;&nbsp; {{$a->name}} </td>
+                                                    <td style="text-align:right;">{{( number_format($pendek) )}}</td>
                                                     <td></td>
                                                 </tr>
                                                 
                                                 @endforeach
                                                 <tr>
-                                                    <td><strong>Total Pendapatan Diluar Usaha</strong></td>
+                                                    <td><strong>Total Utang Jangka Pendek</strong></td>
                                                     <td></td>
-                                                    <td style="text-align:right;">{{ number_format($total_nb_income) }}</td>
+                                                    <td style="text-align:right;">{{( number_format($total_pendek) )}}</td>
                                                 </tr>
-
-
-                                                <tr><td colspan="3"><strong>Biaya Diluar Usaha</strong></td></tr>
+                                                <tr><td colspan="3"><strong>Utang Jangka Panjang</strong></td></tr>
                                                 @php
-                                                $total_nb_cost = 0;
+                                                $total_general_fees = 0;
+
+                                                $total_panjang =0;
                                                 @endphp
-                                                @foreach($data['non_business_cost'] as $a)
+                                                @foreach($dt['utang_panjang'] as $a)
                                                 @php
-                                                    $nb_cost = DB::table('ml_journal_list')
+                                                    $panjang = DB::table('ml_journal_list')
                                                         ->where('asset_data_id', $a->id)
-                                                        ->where('account_code_id', 12)
+                                                        ->where('account_code_id', 5)
                                                         ->where('created', '>=', $awal)
                                                         ->where('created', '<=', $akhir)
-                                                        ->sum(\DB::raw('debet-credit'));
-                                                    $total_nb_cost = $total_nb_cost + $nb_cost;
+                                                        ->sum(\DB::raw('credit-debet'));
+                                                    $total_panjang = $total_panjang + $panjang;
                                                 @endphp
                                                 <tr>
-                                                    <td>&nbsp;&nbsp;&nbsp;&nbsp;{{ $a->name }}</td>
-                                                    <td style="text-align:right;">({{ number_format($nb_cost) }})</td>
+                                                    <td>&nbsp;&nbsp;&nbsp;&nbsp; {{$a->name}} </td>
+                                                    <td style="text-align:right;">{{number_format($panjang)}}</td>
                                                     <td></td>
                                                 </tr>
                                                 
                                                 @endforeach
                                                 <tr>
-                                                    <td><strong>Total Biaya Diluar Usaha</strong></td>
+                                                    <td><strong>Total Utang Jangka Panjang</strong></td>
                                                     <td></td>
-                                                    <td style="text-align:right;">({{ number_format($total_nb_cost) }})</td>
+                                                    <td style="text-align:right;">{{number_format($total_panjang)}}</td>
                                                 </tr>
+
+                                                <tr><td colspan="3"><strong>Modal</strong></td></tr>
                                                 @php
-                                                    $laba_bersih = $laba_rugi_kotor - $total_selling_cost - $total_general_fees + $total_nb_income - $total_nb_cost;
+                                                $total_nb_income = 0;
+
+                                                $total_modal = 0;
+                                                @endphp
+                                                @foreach($dt['modal'] as $a)
+                                                @php
+                                                    $modal = DB::table('ml_journal_list')
+                                                        ->where('asset_data_id', $a->id)
+                                                        ->where('account_code_id', 6)
+                                                        ->where('created', '>=', $awal)
+                                                        ->where('created', '<=', $akhir)
+                                                        ->sum(\DB::raw('credit-debet'));
+                                                    $total_modal = $total_modal + $modal;
                                                 @endphp
                                                 <tr>
-                                                    <td><strong>LABA/RUGI BERSIH</strong></td>
+                                                    <td>&nbsp;&nbsp;&nbsp;&nbsp; {{$a->name}} </td>
+                                                    <td style="text-align:right;"> {{number_format($modal)}} </td>
                                                     <td></td>
-                                                    <td style="text-align:right;"><strong>{{ number_format($laba_bersih) }}</strong></td>
+                                                </tr>
+                                                
+                                                @endforeach
+                                                <td>&nbsp;&nbsp;&nbsp;&nbsp; LABA/RUGI BERSIH </td>
+                                                <td style="text-align:right;"> {{number_format($laba_bersih)}} </td>
+                                                <td></td>
+                                                <tr>
+                                                    <td><strong>Total Modal</strong></td>
+                                                    <td></td>
+                                                    <td style="text-align:right;"> {{number_format($total_modal + $laba_bersih)}} </td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>TOTAL UTANG DAN MODAL</strong></td>
+                                                    <td></td>
+                                                    <td style="text-align:right;"><strong> {{number_format($total_pendek + $total_panjang + $total_modal + $laba_bersih)}}</strong></td>
                                                 </tr>
                                                 
 
