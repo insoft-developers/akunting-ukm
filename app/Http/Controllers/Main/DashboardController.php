@@ -206,7 +206,9 @@ class DashboardController extends Controller
     {
         $input = $request->all();
         $awal = $input['tahun'].'-'.$input['bulan'].'-01';
-        $akhir = $input['tahun'].'-'.$input['bulan'].'-31';
+        $tanggal_akhir = cal_days_in_month(CAL_GREGORIAN, $input['bulan'], $input['tahun']);
+        $akhir = $input['tahun'].'-'.$input['bulan'].'-'.$tanggal_akhir;
+       
 
         $str_awal = strtotime($awal);
         $str_akhir = strtotime($akhir);
@@ -231,7 +233,12 @@ class DashboardController extends Controller
                 return '<div sytle="text-align:right";>Rp. '.number_format($data->total_balance).'</div>';
             })
             ->addColumn('action', function($data){
-                return '<center><a href="'.url('journal_edit/'.$data->id).'"><button style="width:70px;margin-bottom:5px;" class="btn btn-warning btn-sm">Sunting</button></a><button onclick="journal_delete('.$data->id.')" style="width:70px;" class="btn btn-danger btn-sm">Hapus</button></center>';
+                if($data->is_opening_balance == 1) {
+                    return '<center><a href="javascript:void(0);"><button disabled="disabled" style="width:70px;margin-bottom:5px;" class="btn btn-warning btn-sm">Sunting</button></a><button disabled="disabled" style="width:70px;" class="btn btn-danger btn-sm">Hapus</button></center>';
+                } else {
+                    return '<center><a href="'.url('journal_edit/'.$data->id).'"><button style="width:70px;margin-bottom:5px;" class="btn btn-warning btn-sm">Sunting</button></a><button onclick="journal_delete('.$data->id.')" style="width:70px;" class="btn btn-danger btn-sm">Hapus</button></center>';
+                }
+                
             })
         ->rawColumns(['action','dibuat','tanggal','total_balance'])
         ->make(true);

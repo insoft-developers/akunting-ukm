@@ -43,7 +43,7 @@
             <div class="row">
                 <!-- [Leads] start -->
                
-                <div class="col-xxl-8"> 
+                <div class="col-xxl-12"> 
                     <div class="card stretch stretch-full">
                        
                         <div class="card-header">

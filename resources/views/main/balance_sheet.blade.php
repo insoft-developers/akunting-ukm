@@ -42,7 +42,7 @@
         <div class="main-content">
             <div class="row">
                 <!-- [Leads] start -->
-                <div class="col-xxl-8"> 
+                <div class="col-xxl-12"> 
                     <div class="card stretch stretch-full">
                         <div class="card-header">
                             <h5 class="card-title">Neraca</h5>
@@ -51,7 +51,10 @@
                                 $tahun_ini = date('Y');
 
                                 $awal = strtotime(date('Y-m-01'));
-                                $akhir = strtotime(date('Y-m-31'));
+                                $tanggal_akhir = cal_days_in_month(CAL_GREGORIAN, date('m'), date('Y'));
+                                $end = date('Y').'-'.date('m').'-'.$tanggal_akhir;
+                                
+                                $akhir = strtotime($end);
                             @endphp
                            
                         </div>    
@@ -143,7 +146,7 @@
                                                 </tr>
                                                 <tr><td colspan="3" style="border-top:2px solid black;"><strong>Aktiva Lancar</strong></td></tr>
                                                 @php
-                                                $total_income =0;
+                                            
 
                                                  $total_lancar = 0;
                                                 @endphp
@@ -170,7 +173,7 @@
                                                 </tr>
                                                 <tr><td colspan="3"><strong>Aktiva Tetap</strong></td></tr>
                                                 @php
-                                                 $total_hpp = 0;
+                                                
                                                  $total_tetap = 0;
                                                 @endphp
                                                 @foreach($dt['aktiva_tetap'] as $a)
@@ -195,7 +198,7 @@
                                                     <td style="text-align:right;">{{number_format($total_tetap)}}</td>
                                                 </tr>
                                                 @php
-                                                    $laba_rugi_kotor = $total_income - $total_hpp;
+                                                   
 
                                                     $total_aktiva = $total_lancar + $total_tetap;
                                                 @endphp
@@ -206,7 +209,7 @@
                                                 </tr>
                                                 <tr><td colspan="3"><strong>Utang Jangka Pendek</strong></td></tr>
                                                 @php
-                                                 $total_selling_cost = 0;
+                                              
 
                                                  $total_pendek = 0;
                                                 @endphp
@@ -234,7 +237,7 @@
                                                 </tr>
                                                 <tr><td colspan="3"><strong>Utang Jangka Panjang</strong></td></tr>
                                                 @php
-                                                $total_general_fees = 0;
+                                                
 
                                                 $total_panjang =0;
                                                 @endphp
@@ -263,8 +266,7 @@
 
                                                 <tr><td colspan="3"><strong>Modal</strong></td></tr>
                                                 @php
-                                                $total_nb_income = 0;
-
+                                               
                                                 $total_modal = 0;
                                                 @endphp
                                                 @foreach($dt['modal'] as $a)

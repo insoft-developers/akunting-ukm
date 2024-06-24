@@ -247,4 +247,28 @@
             return $row->name;
         }
 
+        public function list_account() 
+    {
+        $data['income'] = DB::table('ml_income')->where('userid', session('id'))->where('account_code_id', 7)->orderBy('id')->get();
+        $data['hpp'] = DB::table('ml_cost_good_sold')->where('userid', session('id'))->where('account_code_id', 8)->orderBy('id')->get();
+        $data['selling_cost'] = DB::table('ml_selling_cost')->where('userid', session('id'))->where('account_code_id', 9)->orderBy('id')->get();
+        $data['general_fees'] = DB::table('ml_admin_general_fees')->where('userid', session('id'))->where('account_code_id', 10)->orderBy('id')->get();
+        $data['non_business_income'] = DB::table('ml_non_business_income')->where('userid', session('id'))->where('account_code_id', 11)->orderBy('id')->get();
+        $data['non_business_cost'] = DB::table('ml_non_business_expenses')->where('userid', session('id'))->where('account_code_id', 12)->orderBy('id')->get();
+
+        return $data;
+    }
+
+
+    public function list_balance_account() 
+    {
+        $data['aktiva_lancar'] = DB::table('ml_current_assets')->where('userid', session('id'))->where('account_code_id', 1)->orderBy('id')->get();
+        $data['aktiva_tetap'] = DB::table('ml_fixed_assets')->where('userid', session('id'))->where('account_code_id', 2)->orderBy('id')->get();
+        $data['utang_pendek'] = DB::table('ml_shortterm_debt')->where('userid', session('id'))->where('account_code_id', 4)->orderBy('id')->get();
+        $data['utang_panjang'] = DB::table('ml_longterm_debt')->where('userid', session('id'))->where('account_code_id', 5)->orderBy('id')->get();
+        $data['modal'] = DB::table('ml_capital')->where('userid', session('id'))->where('account_code_id', 6)->orderBy('id')->get();
+        
+        return $data;
+    }
+
   }

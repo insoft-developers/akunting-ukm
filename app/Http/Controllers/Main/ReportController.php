@@ -49,8 +49,10 @@ class ReportController extends Controller
     public function submit_profit_loss(Request $request) {
         $input = $request->all();
         
+        $tanggal_akhir = cal_days_in_month(CAL_GREGORIAN, $input['month_to'], $input['year_to']);
+
         $start = $input['year_from'].'-'.$input['month_from'].'-01';
-        $end = $input['year_to'].'-'.$input['month_to'].'-31';
+        $end = $input['year_to'].'-'.$input['month_to'].'-'.$tanggal_akhir;
         $awal = strtotime($start);
         $akhir = strtotime($end);
         
@@ -255,7 +257,9 @@ class ReportController extends Controller
 
     public function count_net_profit($m_from, $y_from, $m_to, $y_to) {  
         $start = $y_from.'-'.$m_from.'-01';
-        $end = $y_to.'-'.$m_to.'-31';
+       
+        $tanggal_akhir = cal_days_in_month(CAL_GREGORIAN, $m_to, $y_to);
+        $end = $y_to.'-'.$m_to.'-'.$tanggal_akhir;
         $awal = strtotime($start);
         $akhir = strtotime($end);
         
@@ -355,8 +359,12 @@ class ReportController extends Controller
     public function submit_balance_sheet(Request $request) {
         $input = $request->all();
         
+        $tanggal_akhir = cal_days_in_month(CAL_GREGORIAN, $input['month_to'], $input['year_to']);
+        
+
         $start = $input['year_from'].'-'.$input['month_from'].'-01';
-        $end = $input['year_to'].'-'.$input['month_to'].'-31';
+        $end = $input['year_to'].'-'.$input['month_to'].'-'.$tanggal_akhir;
+        
         $awal = strtotime($start);
         $akhir = strtotime($end);
         

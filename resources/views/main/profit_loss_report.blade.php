@@ -42,7 +42,7 @@
         <div class="main-content">
             <div class="row">
                 <!-- [Leads] start -->
-                <div class="col-xxl-8"> 
+                <div class="col-xxl-12"> 
                     <div class="card stretch stretch-full">
                         <div class="card-header">
                             <h5 class="card-title">Laba Rugi</h5>
@@ -51,7 +51,10 @@
                                 $tahun_ini = date('Y');
 
                                 $awal = strtotime(date('Y-m-01'));
-                                $akhir = strtotime(date('Y-m-31'));
+                                $tanggal_akhir = cal_days_in_month(CAL_GREGORIAN, date('m'), date('Y'));
+                                $end = date('Y').'-'.date('m').'-'.$tanggal_akhir;
+                                
+                                $akhir = strtotime($end);
                             @endphp
                            
                         </div>    

@@ -592,6 +592,11 @@
             data: $(this).serialize(),
             success: function(data) {
                 console.log(data);
+                Swal.fire({
+                    title: "Success!",
+                    text: data.message,
+                    icon: "success"
+                });
             }
         });
     })
