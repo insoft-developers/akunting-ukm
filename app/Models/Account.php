@@ -24,7 +24,10 @@ class Account extends Model
         "recovery_code",
         "recovery_code_duration",
         "token",
-        "created"
+        "created",
+        "referal_source",
+        "referal_code",
+        "is_active"
         
     ];
 

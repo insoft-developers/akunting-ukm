@@ -52,17 +52,17 @@
                         <div class="card-body custom-card-action p-0">
                             <div class="container mtop30 main-box">
                                 <table class="table table-hover">
-                                    <tr>
+                                    <tr onclick="on_company_setting_click()">
                                         <td class="menu-report-row"><strong><span class="report-menu-title">Pengaturan Perusahaan</span></strong><br><span class="report-menu-subtitle">Pengaturan Profil Perusahaan</span></td>
                                     </tr>
-                                    <tr>
+                                    <tr onclick="on_initial_capital()">
                                         <td class="menu-report-row"><strong><span class="report-menu-title">Pengaturan Modal Awal</span></strong><br><span class="report-menu-subtitle">Atur Modal Awal Perusahaan</span></td>
                                     </tr>
                                     <tr>
                                         <td class="menu-report-row"><strong><span class="report-menu-title">Pengaturan Kode Rekening</span></strong><br><span class="report-menu-subtitle">Daftar Kode Rekening Perusahaan</span></td>
                                     </tr>
-                                    <tr>
-                                        <td class="menu-report-row"><a href="{{ url('generate_opening_balance') }}"><strong><span class="report-menu-title">Generate Opening Balance</span></strong><br><span class="report-menu-subtitle">Generate Opening Balance</span></a></td>
+                                    <tr onclick="on_opening_balance_click()">
+                                        <td class="menu-report-row"><strong><span class="report-menu-title">Generate Opening Balance</span></strong><br><span class="report-menu-subtitle">Generate Opening Balance</span></td></a>
                                     </tr>
                                     
                                 </table>

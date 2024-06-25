@@ -19,12 +19,13 @@ use App\Http\Middleware\mAuth;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-
 Route::get('/frontend_register', [AccountController::class, 'register']);
 Route::post('/signup', [AccountController::class, 'signup']);
 Route::get('/frontend_login', [AccountController::class, 'login']);
 Route::post('/login_action', [AccountController::class, 'login_action'])->name('login.action');
 Route::get('/frontend_logout', [AccountController::class, 'logout']);
+Route::get('/terimakasih', [AccountController::class, 'terimakasih']);
+Route::get('/account_activate', [AccountController::class, 'account_activate']);
 
 
 Route::group(['middleware' => 'mAuth'], function () {
@@ -48,6 +49,11 @@ Route::group(['middleware' => 'mAuth'], function () {
     Route::get('setting', [SettingController::class,'index']);
     Route::get('generate_opening_balance', [SettingController::class, 'generate_opening_balance']);
     Route::post('submit_opening_balance', [SettingController::class, 'submit_opening_balance']);
+
+    Route::get('company_setting',[SettingController::class, 'company_setting']);
+    Route::post('company_setting_update', [SettingController::class, 'company_setting_update']);
+    Route::get('initial_capital', [SettingController::class, 'initial_capital']);
+    Route::post('save_initial_capital', [SettingController::class, 'save_initial_capital']);
 });
 
 

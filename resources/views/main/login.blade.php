@@ -87,6 +87,17 @@ $setting = \App\Models\Setting::findorFail(1);
                                 </div>
                             </div>
                         @endif
+                        @if ( session()->has('success') )
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="alert alert-success">
+                                        {!! session('success') !!}
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
+
                         <form method="POST" action="{{ route('login.action') }}" class="w-100 pt-2">
                             @csrf
                             <div class="mb-4">

@@ -215,6 +215,7 @@ class DashboardController extends Controller
 
         
         $query = DB::table('ml_journal')->where('userid', session('id'))
+        ->where('transaction_name', '!=', 'Saldo Awal')
         ->where('created', '>=', $str_awal)
         ->where('created', '<=', $str_akhir);
         if(! empty($input['cari'])) {
@@ -1048,6 +1049,7 @@ class DashboardController extends Controller
 
         return $data;
     }
+
 
     public function journal_multiple_form() {
         $data = $this->get_account_select();

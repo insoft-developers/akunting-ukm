@@ -171,6 +171,10 @@
     #btn-submit-profit-loss{    
         height: 34px;
     }
+    .help-block{
+        color: red;
+        margin-top: 10px;
+    }
 
 
 </style>

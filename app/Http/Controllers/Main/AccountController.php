@@ -12,6 +12,8 @@ use Session;
 use App\Models\Category;
 use Illuminate\Support\Facades\Hash;
 use Redirect;
+use Mail;
+use App\Mail\RegisterMail;
 
 
 class AccountController extends Controller
@@ -23,6 +25,37 @@ class AccountController extends Controller
         $request->session()->flush();
         return redirect('/frontend_login');
     }
+
+
+	public function terimakasih() {
+		return view('main.terimakasih');
+	}
+
+
+	public function account_activate(Request $request) {
+		$input = $request->all();
+		$cek = DB::table('mail_tokens')
+			->where('token', $input['code']);
+		
+		if($cek->count() == 1) {
+			$data = $cek->first();
+			$enc_email = SHA1($data->email);
+			if($enc_email == $input['id']) {
+				$res = DB::table('ml_accounts')->where('email', $data->email)
+					->update(['is_active'=>1]);
+
+				DB::table('mail_tokens')->where('token', $input['code'])->delete();
+				return Redirect::to('frontend_login')->with('success', "Congratulations your account has been activated now, Please Login!"); 
+			} else {
+				return Redirect::to('frontend_login')->with('error', "Failed, your email is invalid!"); 
+			}
+		} else {
+			return  Redirect::to('frontend_login')->with('error', "Failed, Token is invalid!"); 
+		}
+
+	
+	}
+
 	
 	public function login() {
 		$view = 'login';
@@ -46,12 +79,17 @@ class AccountController extends Controller
 				if($account->is_soft_delete == 1) {
 					return Redirect::back()->with('error', "Account Not Found!");
 				}else {
-					$generate_token = Str::random(36);
-					session(["id"=> $account->id, "username"=> $account->username, 'name'=> $account->fullname, "email"=> $account->email, "token"=> $generate_token, "is_upgraded"=> $account->is_upgraded]);
+					if($account->is_active == 1) {
+						$generate_token = Str::random(36);
+						session(["id"=> $account->id, "username"=> $account->username, 'name'=> $account->fullname, "email"=> $account->email, "token"=> $generate_token, "is_upgraded"=> $account->is_upgraded]);
 
-					Account::where('id', $account->id)
-						->update(['token'=> $generate_token]);
-					return Redirect::to('/');
+						Account::where('id', $account->id)
+							->update(['token'=> $generate_token]);
+						return Redirect::to('/');
+					} else {
+						return Redirect::back()->with('error', "Your account hasn't been activated yet!");
+					}
+					
 				}
 			} else {
 				return Redirect::back()->with('error', "The email address or password you entered is incorrect, please try again!"); 
@@ -63,7 +101,11 @@ class AccountController extends Controller
 
 	}
 
-	public function register() {
+	public function register(Request $request) {
+		$input = $request->all();
+		
+		$referal = $request->ref == null ? '' : $request->ref;
+
         $view = "register";
 		$category = Category::all();
 		$district = DB::table('districts')
@@ -71,7 +113,7 @@ class AccountController extends Controller
 			->join('regencies', 'regencies.id', '=', 'districts.regency_id')
 			->join('provinces', 'provinces.id', '=', 'regencies.province_id')
 			->get();
-        return view('main.register', compact('view', 'category', 'district'));
+        return view('main.register', compact('view', 'category', 'district', 'referal'));
     }
 
     public function signup(Request $request) {
@@ -84,7 +126,7 @@ class AccountController extends Controller
             "whatsapp" => "required",
             "password" => "required|min:6|confirmed",
             "tos" => "required",
-			"category" => "required"
+			"category" => "required",
         );
 
         $validator = Validator::make($input, $rules);
@@ -98,6 +140,12 @@ class AccountController extends Controller
         $input['roles'] = 1;
         $input['role_code'] = 'general_member';
         $input['created'] = time();
+		$rs = empty($input['referal_source']) ? "BERTUMBUH" : $input['referal_source'];
+
+		$input['referal_source'] = $rs;
+		$input['is_active'] = 0;
+		$input['referal_code'] = uniqid();
+
         $query = Account::create($input);
         $id = $query->id;
 
@@ -134,27 +182,8 @@ class AccountController extends Controller
 
         $create_user_info = ['user_id' => $id, 'phone_number' => $input['whatsapp']];
         DB::table('ml_user_information')->insert($create_user_info);
+		$this->sendMail($input['email'], $input['fullname']);
 
-
-
-        // Automaticaly login to dashboard afte successfuly signup
-        // $res = $this->db->sql_prepare("select id, username from ml_accounts where id = :id");
-        // $bindParam = $this->db->sql_bindParam(['id' => $id], $res);
-        // $row = $this->db->sql_fetch_single($bindParam);
-
-        
-
-        $generate_token = Str::random(36);
-
-        // $set_session	= ['id' => $row['id'], 'client_id' => 0, 'username' => $row['username'], 'token' => $generate_token];
-        session(["id"=> $id, "client_id"=> 0, "username" => $input['username'], "token"=> $generate_token]);
-
-        // $this->db->sql_update(['token' => $generate_token], 'ml_accounts', ['id' => $row['id']]);
-        Account::where('id',$id)->update([
-            "token" => $generate_token,
-        ]);
-        
-        // Add script code for marketing subscriber
         $params = 
         [
             'first_name' 	=> $input['fullname'],
@@ -172,11 +201,11 @@ class AccountController extends Controller
         $output = curl_exec($ch);
         curl_close($ch);
 
-        // echo json_encode(['status' => 'success', 'url' => base_url('manage_journal')]);
-        // exit;
 
 
-        return redirect('/');        
+		
+
+        return redirect('/terimakasih');        
     }
 
 
@@ -432,4 +461,26 @@ class AccountController extends Controller
 			DB::table('ml_non_business_expenses')->insert(['userid'	=> $userid, 'name' => $value, 'code' => $get_code, 'account_code_id' => 12, 'can_be_deleted' => 1, 'created' => time()]);
 		}
 	}
+
+
+	public function sendMail($email, $name) {
+        $input['email'] = $email;
+        $input['token'] = Str::random(64);
+        
+        $cek = DB::table('mail_tokens')->where('email', $email);
+        if($cek->count() > 0) {
+			DB::table('mail_tokens')->where('email', $email)->update(["token"=> $input['token']]);
+        } else {
+            DB::table('mail_tokens')->insert($input);
+        }
+
+        $details = [
+            'nama' => $name,
+            'email' => $email,
+            'link' => $input['token'],
+			'id' => SHA1($email)
+        ];
+         
+        Mail::to($email)->send(new RegisterMail($details));
+    }
 }

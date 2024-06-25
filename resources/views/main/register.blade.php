@@ -156,6 +156,7 @@ $setting = \App\Models\Setting::findorFail(1);
                     <form method="POST" action="{{ url('signup') }}" class="w-100 mt-4 pt-2">
                         @csrf
                         <div class="mb-3">
+                            {{ Request::segment(2) }}
                             <input type="text" value="{{ old('fullname') }}" class="form-control" id="fullname" name="fullname" placeholder="Nama Sesuai KTP">
                             @if($errors->has('fullname'))
                                 <span class="help-block">{{ $errors->first('fullname') }}</span>
@@ -232,6 +233,10 @@ $setting = \App\Models\Setting::findorFail(1);
                             @if($errors->has('business_phone'))
                                 <span class="help-block">{{ $errors->first('business_phone') }}</span>
                             @endif
+                        </div>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" value="{{ $referal }}" id="referal_source" name="referal_source" placeholder="Referal/Sales">
+                            
                         </div>
 
                         <div class="mt-4">
