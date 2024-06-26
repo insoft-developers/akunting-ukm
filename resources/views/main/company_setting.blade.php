@@ -115,6 +115,64 @@
                                             </div>
                                             
                                         </div>
+
+                                        <div class="col-md-4 mtop20">
+                                            <div class="form-group">
+                                                <label>Bank</label>
+                                                <select name="bank" type="text" class="form-control cust-control">
+                                                    <option value="">Pilih</option>
+                                                    @if($data == null) 
+                                                        <option value="BRI">BRI</option>
+                                                        <option value="BNI">BNI</option>
+                                                        <option value="MANDIRI">MANDIRI</option>
+                                                        <option value="BCA">BCA</option>
+                                                        <option value="CIMB NIAGA">CIMB NIAGA</option>
+                                                        <option value="BSI">BSI</option>
+                                                        <option value="GOPAY">GOPAY</option>
+                                                        <option value="DANA">DANA</option>
+                                                        <option value="OVO">OVO</option>
+                                                    @else
+                                                        <option <?php if($data->bank == "BRI") echo "selected" ;?> value="BRI">BRI</option>
+                                                        <option <?php if($data->bank == "BNI") echo "selected" ;?> value="BNI">BNI</option>
+                                                        <option <?php if($data->bank == "MANDIRI") echo "selected" ;?> value="MANDIRI">MANDIRI</option>
+                                                        <option <?php if($data->bank == "BCA") echo "selected" ;?> value="BCA">BCA</option>
+                                                        <option <?php if($data->bank == "CIMB NIAGA") echo "selected" ;?> value="CIMB NIAGA">CIMB NIAGA</option>
+                                                        <option <?php if($data->bank == "BSI") echo "selected" ;?> value="BSI">BSI</option>
+                                                        <option <?php if($data->bank == "GOPAY") echo "selected" ;?> value="GOPAY">GOPAY</option>
+                                                        <option <?php if($data->bank == "DANA") echo "selected" ;?> value="DANA">DANA</option>
+                                                        <option <?php if($data->bank == "OVO") echo "selected" ;?> value="OVO">OVO</option>
+                                                    @endif
+                                                    
+                                                </select>
+                                            </div>
+                                            
+                                        </div>
+
+                                        <div class="col-md-4 mtop20">
+                                            <div class="form-group">
+                                                <label>No Rekening</label>
+                                                <input name="no_rekening" value="{{$data == null ? "" : $data->no_rekening }}" type="text" class="form-control cust-control" placeholder="masukkan no rekening">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mtop20">
+                                            <div class="form-group">
+                                                <label>Petty Cash</label>
+                                                <select name="petty_cash" type="text" class="form-control cust-control">
+                                                    <option value="">Pilih</option>
+                                                    @if($data == null)
+                                                        <option value="1">ON</option>
+                                                        <option value="2">OFF</option>
+                                                    @else 
+                                                        <option <?php if($data->petty_cash == 1) echo "selected" ;?> value="1">ON</option>
+                                                        <option <?php if($data->petty_cash == 2) echo "selected" ;?> value="2">OFF</option>
+                                                    @endif
+                                                   
+                                                </select>
+                                            </div>
+                                            
+                                        </div>
+
+
                                         <div class="col-md-12 mtop20">
                                             <div class="form-group">
                                                 <label>Alamat</label>
@@ -131,8 +189,15 @@
                                             </div>
                                             
                                         </div>
+                                        <div class="col-md-9 mtop20">
+                                            <div class="form-group">
+                                                <label>Nama Wajib Pajak</label>
+                                                <input name="tax_name" type="text" value="{{$data == null ? "" : $data->tax_name }}" class="form-control cust-control" placeholder="enter tax name">
+                                            </div>
+                                            
+                                        </div>
                                     </div>
-                                    <div class="row">
+                                    <div class="row mtop40">
                                         <div class="col-md-12">
                                             <button class="btn btn-primary pull-right">Simpan Perubahan</button>
                                         </div>

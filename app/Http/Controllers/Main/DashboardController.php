@@ -154,15 +154,7 @@ class DashboardController extends Controller
 		$st_id 		= $var_st_cid[0];
 		$st_code_id = $var_st_cid[1];
 
-		// $res1 = $this->db->sql_prepare("select * from ml_transaction_subcat where account_code_id = :id and received_from_status = 0 order by id");
-		// $bindParam1 = $this->db->sql_bindParam(['id' => $rf_code_id], $res1);
-		// while ($row1 = $this->db->sql_fetch_single($bindParam1))
-		// {
-		// 	if ($row1['transaction_id'] !== 3 && $row1['transaction_id'] !== 5)
-		// 	{
-		// 		$output1[] = $row1['transaction_id'];
-		// 	}
-		// }
+		
 
         $row1 = DB::table('ml_transaction_subcat')->where('account_code_id', $rf_code_id)->where('received_from_status', 0)->orderBy('id')->get();
         foreach($row1 as $rw1) {
@@ -173,15 +165,6 @@ class DashboardController extends Controller
         }
 
 
-		// $res2 = $this->db->sql_prepare("select * from ml_transaction_subcat where account_code_id = :id and saved_to_status = 0 order by id");
-		// $bindParam2 = $this->db->sql_bindParam(['id' => $st_code_id], $res2);
-		// while ($row2 = $this->db->sql_fetch_single($bindParam2))
-		// {
-		// 	if ($row2['transaction_id'] !== 3 && $row2['transaction_id'] !== 5)
-		// 	{
-		// 		$output2[] = $row2['transaction_id'];
-		// 	}
-		// }
 
         $row2 = DB::table('ml_transaction_subcat')->where('account_code_id', $st_code_id)->where('saved_to_status', 0)->orderBy('id')->get();
         foreach($row2 as $rw2) {

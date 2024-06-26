@@ -54,6 +54,9 @@ Route::group(['middleware' => 'mAuth'], function () {
     Route::post('company_setting_update', [SettingController::class, 'company_setting_update']);
     Route::get('initial_capital', [SettingController::class, 'initial_capital']);
     Route::post('save_initial_capital', [SettingController::class, 'save_initial_capital']);
+    Route::get('account_setting', [SettingController::class, 'account_setting']);
+    Route::get('account_setting/{akun}', [SettingController::class, 'account_detail']);
+    Route::post('save_setting_account', [SettingController::class, 'save_setting_account']);
 });
 
 

@@ -14,7 +14,7 @@
                 </div>
                 <ul class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ url('setting') }}">Pengaturan</a></li>
-                    <li class="breadcrumb-item">Pengaturan Perusahaan</li>
+                    <li class="breadcrumb-item">Pengaturan Kode Rekening</li>
                 </ul>
             </div>
             <div class="page-header-right ms-auto">
@@ -45,26 +45,16 @@
                 <div class="col-xxl-12"> 
                     <div class="card stretch stretch-full">
                         <div class="card-header">
-                            <h5 class="card-title">Pengaturan</h5>
-                
-                           
+                            <h5 class="card-title">Pengaturan Kode Rekening</h5>
                         </div>    
                         <div class="card-body custom-card-action p-0">
                             <div class="container mtop30 main-box">
                                 <table class="table table-hover">
-                                    <tr onclick="on_company_setting_click()">
-                                        <td class="menu-report-row"><strong><span class="report-menu-title">Pengaturan Perusahaan</span></strong><br><span class="report-menu-subtitle">Pengaturan Profil Perusahaan</span></td>
+                                    @foreach ($data['group'] as $index => $item)
+                                    <tr onclick="on_account_item_click({{$index}})">
+                                        <td class="menu-report-row"><strong><span class="report-menu-title">{{ $item }}</span></strong><br><span class="report-menu-subtitle">Pengaturan {{ $item }}</span></td>
                                     </tr>
-                                    <tr onclick="on_initial_capital()">
-                                        <td class="menu-report-row"><strong><span class="report-menu-title">Pengaturan Modal Awal</span></strong><br><span class="report-menu-subtitle">Atur Modal Awal Perusahaan</span></td>
-                                    </tr>
-                                    <tr onclick="on_account_setting_click()">
-                                        <td class="menu-report-row"><strong><span class="report-menu-title">Pengaturan Kode Rekening</span></strong><br><span class="report-menu-subtitle">Daftar Kode Rekening Perusahaan</span></td>
-                                    </tr>
-                                    <tr onclick="on_opening_balance_click()">
-                                        <td class="menu-report-row"><strong><span class="report-menu-title">Generate Opening Balance</span></strong><br><span class="report-menu-subtitle">Generate Opening Balance</span></td></a>
-                                    </tr>
-                                    
+                                   @endforeach
                                 </table>
 
                             </div>

@@ -65,6 +65,7 @@ class SettingController extends Controller
 
 		$laba = $this->count_net_profit($u_from, $u_to);
 		
+		
 
 
 		$journal_delete = Journal::where('userid', session('id'))
@@ -100,7 +101,11 @@ class SettingController extends Controller
 			$id = $j->id;
 
 
-			$lists = JournalList::where('journal_id', $journal->id)->get();
+			$lists = DB::table('ml_journal_list as jl')
+				->select('jl.*', 'j.transaction_name')
+				->join('ml_journal as j', 'j.id', '=', 'jl.journal_id', 'left')
+				->where('jl.journal_id', $journal->id)
+				->get();
 
 			
 			foreach($lists as $list) {
@@ -122,6 +127,7 @@ class SettingController extends Controller
 				} else if($list->account_code_id == 6) {
 					if($list->asset_data_id == $capital->id) {
 						// dd($capital->id);
+						
 						$jl = new JournalList;
 						$jl->journal_id = $id;
 						$jl->rf_accode_id = $list->rf_accode_id;
@@ -130,16 +136,23 @@ class SettingController extends Controller
 						$jl->asset_data_id = $list->asset_data_id;
 						$jl->asset_data_name = $list->asset_data_name;
 						$jl->debet = $list->debet;
-						$jl->credit = $list->credit + $laba - $total_prive;
+						if($list->transaction_name == 'Saldo Awal') {
+							$jl->credit = $list->credit;
+						} else {
+							$jl->credit = $list->credit + $laba - $total_prive;
+						}
+						
 						$jl->is_debt = $list->is_debt;
 						$jl->is_receivables = $list->is_receivables;
 						$jl->created = $u_tanggal;
 						$jl->relasi_trx = $list->relasi_trx;
 						$jl->save();
+						
+						
 					} 
 				}
 			}
-
+			
 		}
 
 		
@@ -269,7 +282,11 @@ class SettingController extends Controller
 					"business_fields" => $input['business_fields'],
 					"npwp" => $input['npwp'],
 					"tax" => $input['tax'],
-					"updated" => time()
+					"updated" => time(),
+					"no_rekening" => $input['no_rekening'],
+					"petty_cash" => $input['petty_cash'],
+					"tax_name" => $input['tax_name'],
+					"bank" => $input['bank']
 				]);
 		} else {
 			DB::table('ml_company')
@@ -295,7 +312,18 @@ class SettingController extends Controller
 	public function initial_capital() {
 		$view = "initial-capital";
 		$akun = $this->get_account_select();
-		return view('main.initial_capital', compact('view','akun'));
+		$data_query = DB::table('ml_journal')
+			->where('userid', session('id'))	
+			->where('transaction_name', 'Saldo Awal')
+			->where('is_opening_balance', null);
+		$data = $data_query->first();
+		if($data_query->count() > 0) {
+			$detail = DB::table('ml_journal_list')->where('journal_id', $data->id)->orderBy('id')->get();
+		} else {
+			$detail = [];
+		}
+        
+		return view('main.initial_capital', compact('view','akun','data','detail'));
 	}
 
 	public function get_account_select() {
@@ -487,6 +515,9 @@ class SettingController extends Controller
 
 	public function save_initial_capital(Request $request) {
         $input = $request->all();
+
+		
+
         $rules = array(
             "akun.*" => "required",
             "debit.*" => "required_without:kredit.*",
@@ -494,6 +525,8 @@ class SettingController extends Controller
             "transaction_date" => "required",
             "transaction_name" => "required",
         );
+
+
 
         $validator = Validator::make($input, $rules);
         if($validator->fails()) {
@@ -529,21 +562,46 @@ class SettingController extends Controller
 
         $get_id_transaction = $this->initTransactionId($input['akun'][0], $input['akun'][1]);
 
-    
-        $data_journal = [
-            'userid'			=> session('id'),
-            'transaction_id'	=> $get_id_transaction,
-            'transaction_name'	=> $this->checkTransactionName($input['transaction_name']),
-            'rf_accode_id'		=> $input['akun'][0],
-            'st_accode_id'		=> $input['akun'][1],
-            'nominal'			=> $nominal,
-            'color_date'		=> $this->get_data_transaction($get_id_transaction, 'color'),
-            'created'			=> $date
-        ];
+		$ids = $input['transaction_id'];
 
-        // First insert data to journal
-        // $this->db->sql_insert($data_journal, 'ml_journal');
-        $journal_id = DB::table('ml_journal')->insertGetId($data_journal);
+		$journal_id = 0;
+
+		if(empty($ids)) {
+			$data_journal = [
+				'userid'			=> session('id'),
+				'transaction_id'	=> $get_id_transaction,
+				'transaction_name'	=> 'Saldo Awal',
+				'rf_accode_id'		=> $input['akun'][0],
+				'st_accode_id'		=> $input['akun'][1],
+				'nominal'			=> $nominal,
+				'color_date'		=> '#'.$this->get_random_color(),
+				'created'			=> $date
+			];
+
+			$journal_id = DB::table('ml_journal')->insertGetId($data_journal);
+		} else {
+			$data_journal = [
+				'userid'			=> session('id'),
+				'transaction_id'	=> $get_id_transaction,
+				'transaction_name'	=> 'Saldo Awal',
+				'rf_accode_id'		=> $input['akun'][0],
+				'st_accode_id'		=> $input['akun'][1],
+				'nominal'			=> $nominal,
+				'color_date'		=> '#'.$this->get_random_color(),
+				'created'			=> $date
+			];
+			DB::table('ml_journal')->where('id', $ids)->update($data_journal);
+			DB::table('ml_journal_list')
+				->where('journal_id', $ids)
+				->delete();
+			$journal_id = $ids;
+
+			DB::table('ml_initial_capital')->where('userid', session('id'))->delete();
+		}
+		
+        
+
+
 
         for ($i = 0; $i < count($input['akun']); $i++) 
         { 
@@ -596,13 +654,346 @@ class SettingController extends Controller
         // Update total saldo
         $reCalculateTotalSaldo = $this->checkTotalBalance($journal_id);
 
-        // Second update data to journal
-        // $this->db->sql_update(['total_balance' => $reCalculateTotalSaldo], 'ml_journal', ['id' => $journal_id]);
         DB::table('ml_journal')->where('id', $journal_id)->update(['total_balance'=> $reCalculateTotalSaldo]);
 
+
+
+		if (is_array($input['akun']))
+		{
+			for ($i = 0; $i < count($input['akun']); $i++) 
+			{ 
+				if ( ! empty($input['debit'][$i]))
+				{
+					$debit = str_replace(',', '', $input['debit'][$i]);
+
+					if ($input['akun'][$i] !== '')
+					{
+						$account_code_id = explode("_", $input['akun'][$i]);
+					}
+
+					
+					$data_debit = [
+						'transaction_name'	=> 'Saldo Awal',
+						'userid'			=> session('id'),
+						'rf_accode_id'		=> '',
+						'st_accode_id'		=> $input['akun'][$i],
+						'account_code_id'	=> $account_code_id[1],
+						// 'asset_data_id'		=> $account_code_id[0],
+						// 'asset_data_name'	=> getAllListAssetWithAccDataId(session('id'), $account_code_id[0], $account_code_id[1]),
+						'debet'				=> $debit,
+						'credit'			=> 0,
+						'created'			=> $date
+					];
+
+					// First insert data to ml_initial_capital
+					DB::table('ml_initial_capital')->insert($data_debit);
+							
+				}
+				
+				if ( ! empty($input['kredit'][$i]))
+				{
+					$credit = str_replace(',', '', $input['kredit'][$i]);
+
+					if ($input['akun'][$i] !== '')
+					{
+						$account_code_id = explode("_", $input['akun'][$i]);
+					}
+
+					$data_credit = [
+						'transaction_name'	=> 'Saldo Awal',
+						'userid'			=> session('id'),
+						'rf_accode_id'		=> $input['akun'][$i],
+						'st_accode_id'		=> '',
+						'account_code_id'	=> $account_code_id[1],
+						// 'asset_data_id'		=> $account_code_id[0],
+						// 'asset_data_name'	=> getAllListAssetWithAccDataId(session('id'), $account_code_id[0], $account_code_id[1]),
+						'debet'				=> 0,
+						'credit'			=> $credit,
+						'created'			=> $date
+					];
+
+					// First insert data to ml_initial_capital
+					DB::table('ml_initial_capital')->insert($data_credit);
+					
+					
+				}
+			}
+		}
+
         return response()->json([
-            "success" => true
+            "success" => true,
+			"message" => "success"
         ]);
     }
+
+	protected function initTransactionId($account_code_id1, $account_code_id2)
+	{
+		$var_rf_cid = explode("_", $account_code_id1);
+		$rf_id 		= $var_rf_cid[0];
+		$rf_code_id = $var_rf_cid[1];
+
+		$var_st_cid = explode("_", $account_code_id2);
+		$st_id 		= $var_st_cid[0];
+		$st_code_id = $var_st_cid[1];
+
+		// $res1 = $this->db->sql_prepare("select * from ml_transaction_subcat where account_code_id = :id and received_from_status = 0 order by id");
+		// $bindParam1 = $this->db->sql_bindParam(['id' => $rf_code_id], $res1);
+		// while ($row1 = $this->db->sql_fetch_single($bindParam1))
+		// {
+		// 	if ($row1['transaction_id'] !== 3 && $row1['transaction_id'] !== 5)
+		// 	{
+		// 		$output1[] = $row1['transaction_id'];
+		// 	}
+		// }
+
+        $row1 = DB::table('ml_transaction_subcat')->where('account_code_id', $rf_code_id)->where('received_from_status', 0)->orderBy('id')->get();
+        foreach($row1 as $rw1) {
+            if ($rw1->transaction_id !== 3 && $rw1->transaction_id !== 5)
+			{
+				$output1[] = $rw1->transaction_id;
+			}
+        }
+
+
+		// $res2 = $this->db->sql_prepare("select * from ml_transaction_subcat where account_code_id = :id and saved_to_status = 0 order by id");
+		// $bindParam2 = $this->db->sql_bindParam(['id' => $st_code_id], $res2);
+		// while ($row2 = $this->db->sql_fetch_single($bindParam2))
+		// {
+		// 	if ($row2['transaction_id'] !== 3 && $row2['transaction_id'] !== 5)
+		// 	{
+		// 		$output2[] = $row2['transaction_id'];
+		// 	}
+		// }
+
+        $row2 = DB::table('ml_transaction_subcat')->where('account_code_id', $st_code_id)->where('saved_to_status', 0)->orderBy('id')->get();
+        foreach($row2 as $rw2) {
+            if ($rw2->transaction_id !== 3 && $rw2->transaction_id !== 5)
+			{
+				$output2[] = $rw2->transaction_id;
+			}
+        }
+
+		$output3 = array_uintersect($output1, $output2, "strcasecmp");
+
+		$k = array_rand($output3);
+		$new_output = $output3[$k];
+
+		return $new_output;
+	}
+
+	public function checkTotalBalance($journal_id)
+	{
+		$total_all_debit 	= 0;
+		$total_all_credit 	= 0;
+
+		$i = 0;
+		// $res_journal_list = $this->db->sql_prepare("select * from ml_journal_list where journal_id = :journal_id order by id");
+		// $bindParam_journal_list = $this->db->sql_bindParam(['journal_id' => $journal_id], $res_journal_list);
+
+        $bindParam_journal_list = DB::table('ml_journal_list')
+            ->where('journal_id', $journal_id)->get();
+
+		// while ($row_journal_list = $this->db->sql_fetch_single($bindParam_journal_list))
+		// {
+		// 	$total_all_debit += $row_journal_list['debet'];
+		// 	$total_all_credit += $row_journal_list['credit'];			
+		// }
+
+        foreach($bindParam_journal_list as $key) {
+            $total_all_debit += $key->debet;
+			$total_all_credit += $key->credit;
+        }
+
+		$new_output['total_all_debit'] = $total_all_debit;
+		$new_output['total_all_credit'] = $total_all_credit;
+
+		if ($new_output['total_all_debit'] == $new_output['total_all_credit'])
+		{
+			$output = $new_output['total_all_debit'];
+		}
+		else
+		{
+			$new_total_all_dc = $new_output['total_all_debit']-$new_output['total_all_credit'];
+
+			$output = $new_total_all_dc;
+		}
+
+		// echo $output;
+		// exit;
+
+		return $output;
+	}
+
+	public function getListInitialCapital()
+	{
+		$rows = DB::table('ml_initial_capital')
+			->where('userid', session('id'))
+			->orderBy('id', 'asc')
+			->get();
+		
+		foreach($rows as $row)
+		{
+			if ( ! empty($row->rf_accode_id))
+			{
+				$row['selected_accode_id'] 	= $row->rf_accode_id;
+			}
+			elseif ( ! empty($row->st_accode_id))
+			{
+				$row['selected_accode_id'] 	= $row->st_accode_id;
+			}
+
+			$row['debet'] 						= ($row->debet == 0) ? '' : number_format($row->debet, 0, '.', ',');
+			$row['credit'] 						= ($row->credit == 0) ? '' : number_format($row->credit, 0, '.', ',');
+			$row['form_debet'] 					= ($row->debet == '') ? 'disabled' : false;
+			$row['form_credit'] 				= ($row->credit == '') ? 'disabled' : false;
+			$row['inputDebitInitialCapital'] 	= $row['debet'];
+			$row['inputCreditInitialCapital'] 	= $row['credit'];
+
+			$output[] = $row;
+		}
+
+		if ( $rows->count() > 0)
+		{
+			$output[] = ['data' => '', 'selected_accode_id' => '', 'inputDebitInitialCapital' => '', 'inputCreditInitialCapital' => '', 'form_debet' => false, 'form_credit' => false];
+			$output[] = ['data' => '', 'selected_accode_id' => '', 'inputDebitInitialCapital' => '', 'inputCreditInitialCapital' => '', 'form_debet' => false, 'form_credit' => false];
+		}
+
+		
+		return response()->json([
+			"success" => true,
+			"data" => $output
+		]);
+	}
+
+
+	public function account_setting() {
+		$view = 'account-setting';
+		$data = $this->get_account_select();
+
+		return view('main.account_setting', compact('view','data'));
+	}
+
+	public function account_detail($account) {
+		$view = 'account-setting-detail';
+		
+		$table = "";
+		$title = "";
+		if($account == "current_assets") {
+			$table = "ml_current_assets";
+			$title = "Aktiva Lancar";
+		} 
+		else if($account == "fixed_assets") {
+			$table = "ml_fixed_assets";
+			$title = "Aktiva Tetap";
+		}
+		else if($account == "accumulated_depreciation") {
+			$table = "ml_accumulated_depreciation";
+			$title = "Akumulasi Penyusutan";
+		}
+		else if($account == "short_term_debt") {
+			$table = "ml_shortterm_debt";
+			$title = "Utang Jangka Pendek";
+		}
+
+		else if($account == "long_term_debt") {
+			$table = "ml_longterm_debt";
+			$title = "Utang Jangka Panjang";
+		}
+		else if($account == "capital") {
+			$table = "ml_capital";
+			$title = "Modal";
+		}
+
+		else if($account == "income") {
+			$table = "ml_income";
+			$title = "Pendapatan";
+		}
+		else if($account == "selling_cost") {
+			$table = "ml_selling_cost";
+			$title = "Biaya Penjualan";
+		}
+
+		else if($account == "cost_good_sold") {
+			$table = "ml_cost_good_sold";
+			$title = "Harga Pokok Penjualan";
+		}
+		else if($account == "admin_general_fees") {
+			$table = "ml_admin_general_fees";
+			$title = "Biaya Umum Admin";
+		}
+		else if($account == "non_business_income") {
+			$table = "ml_non_business_income";
+			$title = "Pendapatan diluar Usaha";
+		}
+		else if($account == "non_business_expenses") {
+			$table = "ml_non_business_expenses";
+			$title = "Biaya diluar Usaha";
+		}
+		
+		$data = DB::table($table)->where('userid', session('id'))->orderBy('id')->get();
+
+		return view('main.account_setting_detail', compact('view','data','title','table'));
+	}
+
+
+	public function save_setting_account(Request $request) {
+		$input = $request->all();
+		$table_name = $input['account_table'];
+		
+		$rules = array(
+			"account_item.*" => "required",
+		);
+
+		$validator = Validator::make($input, $rules);
+		$validator = Validator::make($input, $rules);
+        if($validator->fails()) {
+            $pesan = $validator->errors();
+            $pesanarr = explode(",", $pesan);
+            $find = array("[","]","{","}");
+            $html = '';
+            foreach($pesanarr as $p ) {
+                $n = str_replace($find,"",$p);
+                $o = strstr($n, ':', false);
+                $html .= str_replace(":", "", $o).'<br>';
+            }
+
+            return response()->json([
+            	"success" => false,
+            	"message" => $html
+            ]);
+        }
+
+		foreach($input['id'] as $key => $value) {
+			$cek = DB::table($table_name)->where('id', $value);
+			$slug_str = str_replace(" ","-", $input['account_item'][$key]);
+			$slug = strtolower($slug_str);
+
+			if($cek->count() > 0) {
+				DB::table($table_name)->where('id', $value)
+					->update([
+						"name" => $input['account_item'][$key],
+						"code" => $slug
+					]);
+			} else {
+				DB::table($table_name)
+					->insert([
+						"userid" => session('id'),
+						"transaction_id" => 0,
+						"account_code_id" => $input['account_code_id'][$key],
+						"code" => $slug,
+						"name" => $input['account_item'][$key],
+						"can_be_deleted" => 0,
+						"created" => time()
+					]);
+			}
+		}
+
+		return response()->json([
+			"success" => true,
+			"message" => "success"
+		]);
+
+	}
+
     
 }

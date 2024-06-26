@@ -271,4 +271,17 @@
         return $data;
     }
 
+    public function get_random_color()
+	{
+		// mt_srand((float) microtime()*1000000);
+		
+		$c = '';
+		while (strlen($c) < 6)
+		{
+			$c .= sprintf("%02X", mt_rand(0, 255));
+		}
+
+		return $c;
+	}
+
   }

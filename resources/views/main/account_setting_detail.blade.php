@@ -14,7 +14,8 @@
                 </div>
                 <ul class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ url('setting') }}">Pengaturan</a></li>
-                    <li class="breadcrumb-item">Pengaturan Perusahaan</li>
+                    <li class="breadcrumb-item"><a href="{{ url('account_setting') }}">Pengaturan Kode Rekening</a></li>
+                    <li class="breadcrumb-item">{{ $title }}</li>
                 </ul>
             </div>
             <div class="page-header-right ms-auto">
@@ -45,29 +46,43 @@
                 <div class="col-xxl-12"> 
                     <div class="card stretch stretch-full">
                         <div class="card-header">
-                            <h5 class="card-title">Pengaturan</h5>
-                
-                           
+                            <h5 class="card-title">{{ $title }}</h5>
+                            <a href="javascript:void(0);" onclick="add_item()" class="avatar-text avatar-md bg-default text-white pull-right;" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                                <i class="feather-plus bg-dark"></i>
+                            </a>
                         </div>    
                         <div class="card-body custom-card-action p-0">
+                            <form id="form-setting-account" method="POST">
+                                @csrf
+                            <input type="hidden" name="account_table" value="{{ $table }}">
                             <div class="container mtop30 main-box">
-                                <table class="table table-hover">
-                                    <tr onclick="on_company_setting_click()">
-                                        <td class="menu-report-row"><strong><span class="report-menu-title">Pengaturan Perusahaan</span></strong><br><span class="report-menu-subtitle">Pengaturan Profil Perusahaan</span></td>
-                                    </tr>
-                                    <tr onclick="on_initial_capital()">
-                                        <td class="menu-report-row"><strong><span class="report-menu-title">Pengaturan Modal Awal</span></strong><br><span class="report-menu-subtitle">Atur Modal Awal Perusahaan</span></td>
-                                    </tr>
-                                    <tr onclick="on_account_setting_click()">
-                                        <td class="menu-report-row"><strong><span class="report-menu-title">Pengaturan Kode Rekening</span></strong><br><span class="report-menu-subtitle">Daftar Kode Rekening Perusahaan</span></td>
-                                    </tr>
-                                    <tr onclick="on_opening_balance_click()">
-                                        <td class="menu-report-row"><strong><span class="report-menu-title">Generate Opening Balance</span></strong><br><span class="report-menu-subtitle">Generate Opening Balance</span></td></a>
-                                    </tr>
+                                  <div class="row">
+                                    <div class="col-md-12">
+                                        @php
+                                            $nomor = $data->count();
+                                            
+                                        @endphp
+                                        @foreach ($data as $index => $item)
+                                            <div class="form-group mtop20">
+                                                <input name="account_item[]" id="account_item_{{$index}}" type="text" class="form-control cust-control" value="{{ $item->name }}">
+                                                 <input type="hidden" name="id[]" value="{{ $item->id }}">
+                                                 <input type="hidden" name="account_code_id[]" value="{{ $item->account_code_id }}">
+                                            </div>
+                                        @endforeach
+                                        <div id="setting-input-container"></div>
+                                    </div>
+                                  </div>
                                     
-                                </table>
-
+                                   <div class="row mtop20">
+                                        <div class="col-md-12">
+                                            <button type="submit" class="btn btn-primary pull-right">Simpan</button>
+                                        </div>
+                                   </div>
+                                   
+                                <div class="mtop60"></div>
+                                
                             </div>
+                            </form>
                         </div>
                         
                     </div>

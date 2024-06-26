@@ -1,6 +1,13 @@
 
 @php
 $setting = \App\Models\Setting::findorFail(1);
+$company = DB::table('ml_company')->where('userid', session('id'));
+if($company->count() > 0 ) {
+    $cq = $company->first();
+    $cname = $cq->company_name;
+} else {
+    $cname = "Randu Apps";
+}
 
 @endphp
 
@@ -57,7 +64,7 @@ $setting = \App\Models\Setting::findorFail(1);
                 <a href="index.html" class="b-brand">
                     <!-- ========   change your logo hear   ============ -->
                     <img src="{{ asset('template/main') }}/images/logo.png" alt="" class="logo logo-lg logo-besar" />
-                    <span class="brand-title">Akuntansi UKM</span>
+                    <span class="brand-title">{{ $cname }}</span>
                     <img src="{{ asset('template/main') }}/images/logo.png" alt="" class="logo logo-sm" />
                 </a>
             </div>

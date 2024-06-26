@@ -8,9 +8,12 @@
     }
     .brand-title{
         color: white;
-        font-size: 21px;
-        margin-left: 5px;
-        font-family: cursive;
+        font-size: 17px;
+        /* margin-left: 0px; */
+        display: block;
+        position: absolute;
+        top: 24px;
+        left: 95px;
     }
     
     .img-menu{

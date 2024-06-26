@@ -593,6 +593,10 @@
     function on_initial_capital() {
         window.location = "{{ url('initial_capital') }}";
     }
+
+    function on_account_setting_click() {
+        window.location = "{{ url('account_setting') }}";
+    }
 </script>
 @endif
 
@@ -679,11 +683,35 @@
 @if($view == 'initial-capital')
 <script>
 
-    let index_item = 2;
+    let index_item = "{{ $total_item }}" + +2;
     let total_debit = 0;
     let total_kredit = 0;
 
-    $("#form-tambah-jurnal").submit(function(e){
+
+    
+    
+    // addition_item();
+
+    count_grandtotal();
+
+    function count_grandtotal() {
+        count_total_debit();
+        count_total_kredit();
+    }
+    
+    function addition_item() {
+        var n = "{{ $total_item }}";
+        
+        for(var i=index_item; i < n; i++) {
+            add_item_init(i);
+    
+        }
+        count_total_debit();
+        count_total_kredit();
+    }
+    
+
+    $("#form-update-jurnal").submit(function(e){
         e.preventDefault();
         $.ajax({
             url: "{{ url('save_initial_capital') }}",
@@ -691,9 +719,13 @@
             dataType: "JSON",
             data: $(this).serialize(),
             success: function(data) {
-            
+                
                 if(data.success) {
-                    window.location = "{{ url('/initial') }}";
+                    Swal.fire({
+                        title: "Success!",
+                        text: data.message,
+                        icon: "success"
+                    });
                 } else {
                     show_error(data.message);
                 }
@@ -710,6 +742,8 @@
         } else {
             $("#kredit_"+id).removeAttr('readonly');
         }
+
+        
         count_total_debit();
         
     }
@@ -760,6 +794,7 @@
         $("#row_"+id).remove();
         count_total_debit();
         count_total_kredit();
+        
     }
 
     function add_item() {
@@ -808,10 +843,166 @@
 
         
     }
+
+
+    function add_item_init(n) {
+        
+        var index_detail = +n + +1;
+        
+        index_item++;
+        $.ajax({
+            url:"{{ url('journal_multiple_form') }}",
+            type: "GET",
+            dataType:"JSON",
+            async:true,
+            success: function(data) {
+               
+                var HTML= '';
+                HTML += '<div class="row" id="row_'+index_item+'">';
+                HTML += '<div class="col-md-4">';
+                                            
+                HTML += '<select class="form-control cust-control" id="akun_'+index_item+'" name="akun[]">';
+                HTML += '<option value="">Pilih</option>';
+                for(var i=0; i< data.data.group.length; i++) {
+                    HTML += '<optgroup label="'+data.data.group[i]+'">';
+                        for(var n=0; n< data.data.data.length; n++) {
+                            if(data.data.group[i] == data.data.data[n]['group']) {
+                                 HTML += '<option value="'+data.data.data[n]['id']+'_'+data.data.data[n]['account_code_id']+'">'+data.data.data[n]['name']+'</option>';
+                            }
+                        }
+                    HTML += '</optgroup>';
+                }
+               
+
+                HTML += '</select>';
+                
+                HTML += '</div>';
+
+                HTML += '<div class="col-md-4">';
+                                                
+                HTML += '<input type="number" onkeyup="set_debit('+index_item+')" class="form-control cust-control" placeholder="0" id="debit_'+index_item+'" name="debit[]">';
+                HTML += '</div>';
+                                        
+                HTML += '<div class="col-md-4">';
+                                                
+                HTML += '<input type="number" onkeyup="set_kredit('+index_item+')" class="form-control cust-control" placeholder="0" id="kredit_'+index_item+'" name="kredit[]">';
+                HTML += '<a href="javascript:void(0);" onclick="delete_item('+index_item+')" type="button" class="btn btn-sm del-item"><i class="fa fa-remove"></i></a>';
+                HTML += '</div>';
+
+                $("#input_add_container").append(HTML);                
+            },
+            
+        })
+
+
+    }
 </script>
 @endif
 
+@if($view == 'account-setting')
+<script>
+    function on_account_item_click(id) {
+        var akun = '';
+        if(id == 0) 
+        {
+            akun = "current_assets"
+        } 
+        else if(id== 1) 
+        {
+            akun = "fixed_assets";
+        } 
+        else if(id== 2) 
+        {
+            akun = "accumulated_depreciation";
+        }
+        else if(id== 3) 
+        {
+            akun = "short_term_debt";
+        }
+        else if(id== 4) 
+        {
+            akun = "long_term_debt";
+        }
+        else if(id== 5) 
+        {
+            akun = "capital";
+        }
+        else if(id== 6) 
+        {
+            akun = "income";
+        }
+        else if(id== 7) 
+        {
+            akun = "cost_good_sold";
+        }
+        else if(id== 8) 
+        {
+            akun = "selling_cost";
+        }
+        else if(id== 9) 
+        {
+            akun = "admin_general_fees";
+        }
+        else if(id== 10) 
+        {
+            akun = "non_business_income";
+        }
+        else if(id== 11) 
+        {
+            akun = "non_business_expenses";
+        }
+        window.location = "{{ url('account_setting') }}"+"/"+akun;
+    }
+</script>
+@endif
 
+@if($view == 'account-setting-detail')
+<script>
+
+    let nomor = "{{ $data->count() }}";
+    let account_code_id = "{{ $data[0]->account_code_id }}";
+
+    function add_item() {
+
+        var html ='';
+        html += '<div class="form-group mtop20">';
+        html += '<input name="account_item[]" id="account_item_'+nomor+'" type="text" class="form-control cust-control">';
+        html += '</div>';
+        html += '<input type="hidden" name="id[]">';
+        html += '<input type="hidden" name="account_code_id[]" value="'+account_code_id+'">';
+
+        $("#setting-input-container").append(html);
+        nomor++;
+        
+    }
+
+    $("#form-setting-account").submit(function(e){
+        e.preventDefault();
+        $.ajax({
+            url: "{{ url('save_setting_account') }}",
+            type: "POST",
+            dataType: "JSON",
+            data: $(this).serialize(),
+            success: function(data) {
+                console.log(data);
+                if(data.success) {
+                    Swal.fire({
+                        title: "Success!",
+                        text: data.message,
+                        icon: "success"
+                    });
+                } else {
+                    Swal.fire({
+                        title: "Error!",
+                        html: data.message,
+                        icon: "error"
+                    });
+                }
+            }
+        })
+    })
+</script>
+@endif
 
 
 
