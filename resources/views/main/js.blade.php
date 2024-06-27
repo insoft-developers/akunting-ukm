@@ -1077,6 +1077,18 @@
 
 @if($view == 'trial-balance')
 <script>
+
+    function export_excel() {
+        var monthfrom = $("#month_from").val();
+        var yearfrom = $("#year_from").val();
+        var monthto = $("#month_to").val();
+        var yearto = $("#year_to").val();
+        var tanggal = monthfrom+'_'+yearfrom+'_'+monthto+'_'+yearto;
+        window.location = "{{ url('trial_balance_export') }}"+"/"+tanggal;
+    }
+
+
+
      $("#form-trial-balance-submit").submit(function(e){
         e.preventDefault();
 

@@ -56,7 +56,9 @@
                                 
                                 $akhir = strtotime($end);
                             @endphp
-                           
+                            <a href="javascript:void(0);" onclick="export_excel()" class="avatar-text avatar-md pull-right;" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                                <i class="fa fa-file-excel"></i>
+                            </a>
                         </div>    
                         <div class="card-body custom-card-action p-0">
                             <div class="container mtop30 main-box">
@@ -65,7 +67,7 @@
                                 <div class="row">
                                     <div class="col-md-12" style="display: inline-flex">
                                         <div class="form-group">
-                                            <select style="width:200px;" class="form-control cust-control" name="month_from">
+                                            <select style="width:200px;" class="form-control cust-control" name="month_from" id="month_from">
                                                 <option value="">Semua bulan</option>
                                                 <option <?php if($bulan_ini == "January") echo 'selected' ;?> value="01">January</option>
                                                 <option <?php if($bulan_ini == "February") echo 'selected' ;?> value="02">February</option>
@@ -84,7 +86,7 @@
                                         </div>
                                     
                                    
-                                        <select style="width:200px;margin-left:5px;" class="form-control cust-control" name="year_from">
+                                        <select style="width:200px;margin-left:5px;" class="form-control cust-control" name="year_from" id="year_from">
                                             <option value="">Semua tahun</option>
                                             <option  <?php if($tahun_ini == date('Y') ) echo 'selected' ;?> value="{{ date('Y') }}">{{ date('Y') }}</option>
                                             <option  <?php if($tahun_ini ==  date('Y', strtotime('-1 year', strtotime( date('Y') ))) ) echo 'selected' ;?> value="{{ date('Y', strtotime('-1 year', strtotime( date('Y') ))) }}">{{ date('Y', strtotime('-1 year', strtotime( date('Y') ))) }}</option>
@@ -96,7 +98,7 @@
                                         <span style="width:100px;" class="stanggal-text">Ke Tanggal</span>
                                    
                                         <div class="form-group">
-                                            <select style="width:200px;" class="form-control cust-control" name="month_to">
+                                            <select style="width:200px;" class="form-control cust-control" name="month_to" id="month_to">
                                                 <option value="">Semua bulan</option>
                                                 <option <?php if($bulan_ini == "January") echo 'selected' ;?> value="01">January</option>
                                                 <option <?php if($bulan_ini == "February") echo 'selected' ;?> value="02">February</option>
@@ -114,7 +116,7 @@
                                             </select>
                                         </div>
                                     
-                                        <select style="width:200px;margin-left:5px;" class="form-control cust-control" name="year_to">
+                                        <select style="width:200px;margin-left:5px;" class="form-control cust-control" name="year_to" id="year_to">
                                             <option value="">Semua tahun</option>
                                             <option  <?php if($tahun_ini == date('Y') ) echo 'selected' ;?> value="{{ date('Y') }}">{{ date('Y') }}</option>
                                             <option  <?php if($tahun_ini ==  date('Y', strtotime('-1 year', strtotime( date('Y') ))) ) echo 'selected' ;?> value="{{ date('Y', strtotime('-1 year', strtotime( date('Y') ))) }}">{{ date('Y', strtotime('-1 year', strtotime( date('Y') ))) }}</option>

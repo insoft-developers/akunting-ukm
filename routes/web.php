@@ -54,6 +54,7 @@ Route::group(['middleware' => 'mAuth'], function () {
 
     Route::get('profit_loss_export/{tanggal}', [ReportController::class, 'profit_loss_export']);
     Route::get('balance_sheet_export/{tanggal}', [ReportController::class, 'balance_sheet_export']);
+    Route::get('trial_balance_export/{tanggal}', [ReportController::class, 'trial_balance_export']);
 
 
 

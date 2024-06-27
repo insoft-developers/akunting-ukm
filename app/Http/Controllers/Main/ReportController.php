@@ -8,6 +8,7 @@ use DB;
 use Validator;
 use App\Exports\ProfitLossExport;
 use App\Exports\BalanceExport;
+use App\Exports\TrialExport;
 use Maatwebsite\Excel\Facades\Excel;
 
 
@@ -1290,6 +1291,58 @@ class ReportController extends Controller
         $dt = $this->list_balance_account();
         $laba_bersih = $this->count_net_profit($date[0], $date[1], $date[2], $date[3]);
         return Excel::download(new BalanceExport($dt, $awal, $akhir, $laba_bersih), 'balance_sheet.xlsx');
+    }
+
+
+    public function trial_balance_export($tanggal) 
+    {
+        $date = explode("_",$tanggal);
+
+        
+        $tanggal_akhir = cal_days_in_month(CAL_GREGORIAN, $date[2], $date[3]);
+
+        $start = $date[1].'-'.$date[0].'-01';
+        $end = $date[3].'-'.$date[2].'-'.$tanggal_akhir;
+        $awal = strtotime($start);
+        $akhir = strtotime($end);
+
+        $data = DB::table('ml_journal')
+            ->where('userid', session('id'))
+            ->where('created', '>=', $awal)
+            ->where('created', '<=', $akhir)
+            ->orderBy('created','asc')
+            ->get();
+
+        $dt['current_asset'] = DB::table('ml_current_assets')
+            ->where('userid', session('id'))
+            ->get();
+
+        $dt['fixed_asset'] = DB::table('ml_fixed_assets')
+            ->where('userid', session('id'))
+            ->get();
+
+        $dt['short_debt'] = DB::table('ml_shortterm_debt')
+        ->where('userid', session('id'))
+        ->get(); 
+        
+        $dt['long_debt'] = DB::table('ml_longterm_debt')
+        ->where('userid', session('id'))
+        ->get(); 
+
+        $dt['income'] = DB::table('ml_income')
+        ->where('userid', session('id'))
+        ->get(); 
+
+        $dt['cost_good'] = DB::table('ml_cost_good_sold')
+        ->where('userid', session('id'))
+        ->get(); 
+
+        $dt['capital'] = DB::table('ml_capital')
+        ->where('userid', session('id'))
+        ->get();
+        
+        
+        return Excel::download(new TrialExport($dt, $awal, $akhir, $data), 'trial_balance.xlsx');
     }
 
 
