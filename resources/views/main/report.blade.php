@@ -55,20 +55,20 @@
                                     <tr>
                                         <td class="menu-report-row"><strong><span class="report-menu-title">Sales</span></strong><br><span class="report-menu-subtitle">Laporan Penjualan</span></td>
                                     </tr>
-                                    <tr>
+                                    <tr onclick="on_journal_report_click()">
                                         <td class="menu-report-row"><strong><span class="report-menu-title">Jurnal</span></strong><br><span class="report-menu-subtitle">Laporan Rekapitulasi Jurnal</span></td>
                                     </tr>
-                                    <tr>
+                                    <tr onclick="on_general_ledger_click()">
                                         <td class="menu-report-row"><strong><span class="report-menu-title">Buku Besar</span></strong><br><span class="report-menu-subtitle">Laporan dalam bentuk Buku Besar</span></td>
                                     </tr>
-                                    <tr>
+                                    <tr onclick="on_trial_balance_click()">
                                         <td class="menu-report-row"><strong><span class="report-menu-title">Neraca Saldo</span></strong><br><span class="report-menu-subtitle">Laporan dalam bentuk Neraca Saldo</span></td>
                                     </tr>
-                                    <tr>
-                                        <td class="menu-report-row"><a href="{{ url('profit_loss') }}"><strong><span class="report-menu-title">Laba Rugi</span></strong><br><span class="report-menu-subtitle">Laporan dalam bentuk Laba Rugi</span></a></td>
+                                    <tr onclick="on_profit_loss_click()">
+                                        <td class="menu-report-row"><strong><span class="report-menu-title">Laba Rugi</span></strong><br><span class="report-menu-subtitle">Laporan dalam bentuk Laba Rugi</span></td>
                                     </tr>
-                                    <tr>
-                                        <td class="menu-report-row"><a href="{{ url('balance') }}"><strong><span class="report-menu-title">Neraca</span></strong><br><span class="report-menu-subtitle">Laporan dalam bentuk Neraca</span></a></td>
+                                    <tr onclick="on_balance_click()">
+                                        <td class="menu-report-row"><strong><span class="report-menu-title">Neraca</span></strong><br><span class="report-menu-subtitle">Laporan dalam bentuk Neraca</span></td>
                                     </tr>
                                     <tr>
                                         <td class="menu-report-row"><strong><span class="report-menu-title">Periode</span></strong><br><span class="report-menu-subtitle">Melihat Laporan berdasarkan Periode</span></td>
@@ -79,10 +79,8 @@
                                     <tr>
                                         <td class="menu-report-row"><strong><span class="report-menu-title">Piutang</span></strong><br><span class="report-menu-subtitle">Laporan data Piutang</span></td>
                                     </tr>
-                                    <tr>
-                                        <td class="menu-report-row"><strong><span class="report-menu-title">Ekspor ke Excel</span></strong><br><span class="report-menu-subtitle">Ekspor Laporan ke dalam file format Excel</span></td>
-                                    </tr>
-                                    <tr>
+                                    
+                                    <tr onclick="download_file_spt()">
                                         <td class="menu-report-row"><strong><span class="report-menu-title">SPT PPh OP</span></strong><br><span class="report-menu-subtitle">Buat laporan SPT Tahunan PPh OP</span></td>
                                     </tr>
                                 </table>

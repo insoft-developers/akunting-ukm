@@ -179,5 +179,10 @@
         margin-top: 10px;
     }
 
+    #table-trial-balance td{
+        padding-top: 4px;
+        padding-bottom: 4px;
+    }
+
 
 </style>

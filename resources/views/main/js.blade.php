@@ -626,6 +626,18 @@
 @if($view == 'profit-loss')
 <script>
 
+
+    function export_excel() {
+        var monthfrom = $("#month_from").val();
+        var yearfrom = $("#year_from").val();
+        var monthto = $("#month_to").val();
+        var yearto = $("#year_to").val();
+        var tanggal = monthfrom+'_'+yearfrom+'_'+monthto+'_'+yearto;
+        window.location = "{{ url('profit_loss_export') }}"+"/"+tanggal;
+    }
+
+
+
     $("#form-profit-loss-submit").submit(function(e){
         e.preventDefault();
         $.ajax({
@@ -654,6 +666,16 @@
 
 @if($view == 'balance-sheet')
 <script>
+
+    function export_excel() {
+        var monthfrom = $("#month_from").val();
+        var yearfrom = $("#year_from").val();
+        var monthto = $("#month_to").val();
+        var yearto = $("#year_to").val();
+        var tanggal = monthfrom+'_'+yearfrom+'_'+monthto+'_'+yearto;
+        window.location = "{{ url('balance_sheet_export') }}"+"/"+tanggal;
+    }
+
 
     $("#form-balance-sheet-submit").submit(function(e){
         e.preventDefault();
@@ -1004,6 +1026,98 @@
 </script>
 @endif
 
+@if($view == 'report')
+<script>
+    function on_profit_loss_click() {
+        window.location = "{{ url('profit_loss') }}";
+    }
 
+    function on_balance_click() {
+        window.location = "{{ url('balance') }}";
+    }
 
+    function on_journal_report_click() {
+        window.location = "{{ url('journal_report') }}";
+    }
+
+    function on_trial_balance_click() {
+        window.location = "{{ url('trial_balance') }}";
+    }
+
+    function on_general_ledger_click() {
+        window.location = "{{ url('general_ledger') }}";
+    }
+
+    function download_file_spt() {
+        window.location = "{{ asset('template/main/files/file_spt.xls') }}";
+    }
+
+</script>
+@endif
+@if($view == 'journal-report')
+<script>
+    
+    $("#form-journal-report-submit").submit(function(e){
+        e.preventDefault();
+
+        $.ajax({
+            url: "{{ url('journal_report_submit') }}",
+            type: "POST",
+            dataType: "JSON",
+            data: $(this).serialize(),
+            success: function(data) {
+                console.log(data);
+                $(".table-responsive").html(data.data);
+            }
+        })
+    })
+
+</script>
+@endif
+
+@if($view == 'trial-balance')
+<script>
+     $("#form-trial-balance-submit").submit(function(e){
+        e.preventDefault();
+
+        $.ajax({
+            url: "{{ url('trial_balance_submit') }}",
+            type: "POST",
+            data: $(this).serialize(),
+            success: function(data) {
+                console.log(data);
+                $(".table-responsive").html(data.data);
+            }
+        })
+    })
+</script>
+@endif
+
+@if($view == 'general-ledger')
+<script>
+    
+    $("#form-general-ledger-submit").submit(function(e){
+        e.preventDefault();
+        $.ajax({
+            url: "{{ url('general_ledger_submit') }}",
+            type: "POST",
+            data: $(this).serialize(),
+            success: function(data) {
+                console.log(data);
+
+                if(data.success) {
+                    $(".table-responsive").html(data.data);
+                } else {
+                    Swal.fire({
+                        title: "Error!",
+                        html: data.message,
+                        icon: "error"
+                    });
+                }
+            }
+        })
+    });
+
+</script>
+@endif
 

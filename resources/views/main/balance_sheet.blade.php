@@ -56,80 +56,80 @@
                                 
                                 $akhir = strtotime($end);
                             @endphp
+
+                            <a href="javascript:void(0);" onclick="export_excel()" class="avatar-text avatar-md pull-right;" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                                <i class="fa fa-file-excel"></i>
+                            </a>
                            
                         </div>    
                         <div class="card-body custom-card-action p-0">
                             <div class="container mtop30 main-box">
                                 <form id="form-balance-sheet-submit" method="POST">
                                     @csrf
-                                <div class="row">
-                                    <div class="col-md-2">
-                                        <div class="form-group">
-                                            <select class="form-control cust-control" name="month_from">
-                                                <option value="">Semua bulan</option>
-                                                <option <?php if($bulan_ini == "January") echo 'selected' ;?> value="01">January</option>
-                                                <option <?php if($bulan_ini == "February") echo 'selected' ;?> value="02">February</option>
-                                                <option <?php if($bulan_ini == "March") echo 'selected' ;?> value="03">March</option>
-                                                <option <?php if($bulan_ini == "April") echo 'selected' ;?> value="04">April</option>
-                                                <option <?php if($bulan_ini == "May") echo 'selected' ;?> value="05">May</option>
-                                                <option <?php if($bulan_ini == "June") echo 'selected' ;?> value="06">June</option>
-                                                <option <?php if($bulan_ini == "July") echo 'selected' ;?> value="07">July</option>
-                                                <option <?php if($bulan_ini == "August") echo 'selected' ;?> value="08">August</option>
-                                                <option <?php if($bulan_ini == "September") echo 'selected' ;?> value="09">September</option>
-                                                <option <?php if($bulan_ini == "October") echo 'selected' ;?> value="10">October</option>
-                                                <option <?php if($bulan_ini == "November") echo 'selected' ;?> value="11">November</option>
-                                                <option <?php if($bulan_ini == "December") echo 'selected' ;?> value="12">December</option>
-                                                
+                                    <div class="row">
+                                        <div class="col-md-12" style="display: inline-flex">
+                                            <div class="form-group">
+                                                <select style="width:200px;" class="form-control cust-control" id="month_from" name="month_from">
+                                                    <option value="">Semua bulan</option>
+                                                    <option <?php if($bulan_ini == "January") echo 'selected' ;?> value="01">January</option>
+                                                    <option <?php if($bulan_ini == "February") echo 'selected' ;?> value="02">February</option>
+                                                    <option <?php if($bulan_ini == "March") echo 'selected' ;?> value="03">March</option>
+                                                    <option <?php if($bulan_ini == "April") echo 'selected' ;?> value="04">April</option>
+                                                    <option <?php if($bulan_ini == "May") echo 'selected' ;?> value="05">May</option>
+                                                    <option <?php if($bulan_ini == "June") echo 'selected' ;?> value="06">June</option>
+                                                    <option <?php if($bulan_ini == "July") echo 'selected' ;?> value="07">July</option>
+                                                    <option <?php if($bulan_ini == "August") echo 'selected' ;?> value="08">August</option>
+                                                    <option <?php if($bulan_ini == "September") echo 'selected' ;?> value="09">September</option>
+                                                    <option <?php if($bulan_ini == "October") echo 'selected' ;?> value="10">October</option>
+                                                    <option <?php if($bulan_ini == "November") echo 'selected' ;?> value="11">November</option>
+                                                    <option <?php if($bulan_ini == "December") echo 'selected' ;?> value="12">December</option>
+                                                    
+                                                </select>
+                                            </div>
+                                        
+                                       
+                                            <select style="width:200px;margin-left:5px;" class="form-control cust-control" name="year_from" id="year_from">
+                                                <option value="">Semua tahun</option>
+                                                <option  <?php if($tahun_ini == date('Y') ) echo 'selected' ;?> value="{{ date('Y') }}">{{ date('Y') }}</option>
+                                                <option  <?php if($tahun_ini ==  date('Y', strtotime('-1 year', strtotime( date('Y') ))) ) echo 'selected' ;?> value="{{ date('Y', strtotime('-1 year', strtotime( date('Y') ))) }}">{{ date('Y', strtotime('-1 year', strtotime( date('Y') ))) }}</option>
+                                                <option  <?php if($tahun_ini ==  date('Y', strtotime('-2 year', strtotime( date('Y') ))) ) echo 'selected' ;?> value="{{ date('Y', strtotime('-2 year', strtotime( date('Y') ))) }}">{{ date('Y', strtotime('-2 year', strtotime( date('Y') ))) }}</option>
+                                                <option  <?php if($tahun_ini ==  date('Y', strtotime('-3 year', strtotime( date('Y') ))) ) echo 'selected' ;?> value="{{ date('Y', strtotime('-3 year', strtotime( date('Y') ))) }}">{{ date('Y', strtotime('-3 year', strtotime( date('Y') ))) }}</option>
+                                                <option  <?php if($tahun_ini ==  date('Y', strtotime('-4 year', strtotime( date('Y') ))) ) echo 'selected' ;?> value="{{ date('Y', strtotime('-4 year', strtotime( date('Y') ))) }}">{{ date('Y', strtotime('-4 year', strtotime( date('Y') ))) }}</option>
                                             </select>
+                                        
+                                            <span style="width:100px;" class="stanggal-text">Ke Tanggal</span>
+                                       
+                                            <div class="form-group">
+                                                <select style="width:200px;" class="form-control cust-control" name="month_to" id="month_to">
+                                                    <option value="">Semua bulan</option>
+                                                    <option <?php if($bulan_ini == "January") echo 'selected' ;?> value="01">January</option>
+                                                    <option <?php if($bulan_ini == "February") echo 'selected' ;?> value="02">February</option>
+                                                    <option <?php if($bulan_ini == "March") echo 'selected' ;?> value="03">March</option>
+                                                    <option <?php if($bulan_ini == "April") echo 'selected' ;?> value="04">April</option>
+                                                    <option <?php if($bulan_ini == "May") echo 'selected' ;?> value="05">May</option>
+                                                    <option <?php if($bulan_ini == "June") echo 'selected' ;?> value="06">June</option>
+                                                    <option <?php if($bulan_ini == "July") echo 'selected' ;?> value="07">July</option>
+                                                    <option <?php if($bulan_ini == "August") echo 'selected' ;?> value="08">August</option>
+                                                    <option <?php if($bulan_ini == "September") echo 'selected' ;?> value="09">September</option>
+                                                    <option <?php if($bulan_ini == "October") echo 'selected' ;?> value="10">October</option>
+                                                    <option <?php if($bulan_ini == "November") echo 'selected' ;?> value="11">November</option>
+                                                    <option <?php if($bulan_ini == "December") echo 'selected' ;?> value="12">December</option>
+                                                    
+                                                </select>
+                                            </div>
+                                        
+                                            <select style="width:200px;margin-left:5px;" class="form-control cust-control" name="year_to" id="year_to">
+                                                <option value="">Semua tahun</option>
+                                                <option  <?php if($tahun_ini == date('Y') ) echo 'selected' ;?> value="{{ date('Y') }}">{{ date('Y') }}</option>
+                                                <option  <?php if($tahun_ini ==  date('Y', strtotime('-1 year', strtotime( date('Y') ))) ) echo 'selected' ;?> value="{{ date('Y', strtotime('-1 year', strtotime( date('Y') ))) }}">{{ date('Y', strtotime('-1 year', strtotime( date('Y') ))) }}</option>
+                                                <option  <?php if($tahun_ini ==  date('Y', strtotime('-2 year', strtotime( date('Y') ))) ) echo 'selected' ;?> value="{{ date('Y', strtotime('-2 year', strtotime( date('Y') ))) }}">{{ date('Y', strtotime('-2 year', strtotime( date('Y') ))) }}</option>
+                                                <option  <?php if($tahun_ini ==  date('Y', strtotime('-3 year', strtotime( date('Y') ))) ) echo 'selected' ;?> value="{{ date('Y', strtotime('-3 year', strtotime( date('Y') ))) }}">{{ date('Y', strtotime('-3 year', strtotime( date('Y') ))) }}</option>
+                                                <option  <?php if($tahun_ini ==  date('Y', strtotime('-4 year', strtotime( date('Y') ))) ) echo 'selected' ;?> value="{{ date('Y', strtotime('-4 year', strtotime( date('Y') ))) }}">{{ date('Y', strtotime('-4 year', strtotime( date('Y') ))) }}</option>
+                                            </select>
+                                        
+                                            <button style="float: right;margin-left:5px;margin-top:1px;" id="btn-submit-profit-loss" class="btn btn-primary">Submit</button>
                                         </div>
                                     </div>
-                                    <div class="col-md-2">
-                                        <select class="form-control cust-control" name="year_from">
-                                            <option value="">Semua tahun</option>
-                                            <option  <?php if($tahun_ini == date('Y') ) echo 'selected' ;?> value="{{ date('Y') }}">{{ date('Y') }}</option>
-                                            <option  <?php if($tahun_ini ==  date('Y', strtotime('-1 year', strtotime( date('Y') ))) ) echo 'selected' ;?> value="{{ date('Y', strtotime('-1 year', strtotime( date('Y') ))) }}">{{ date('Y', strtotime('-1 year', strtotime( date('Y') ))) }}</option>
-                                            <option  <?php if($tahun_ini ==  date('Y', strtotime('-2 year', strtotime( date('Y') ))) ) echo 'selected' ;?> value="{{ date('Y', strtotime('-2 year', strtotime( date('Y') ))) }}">{{ date('Y', strtotime('-2 year', strtotime( date('Y') ))) }}</option>
-                                            <option  <?php if($tahun_ini ==  date('Y', strtotime('-3 year', strtotime( date('Y') ))) ) echo 'selected' ;?> value="{{ date('Y', strtotime('-3 year', strtotime( date('Y') ))) }}">{{ date('Y', strtotime('-3 year', strtotime( date('Y') ))) }}</option>
-                                            <option  <?php if($tahun_ini ==  date('Y', strtotime('-4 year', strtotime( date('Y') ))) ) echo 'selected' ;?> value="{{ date('Y', strtotime('-4 year', strtotime( date('Y') ))) }}">{{ date('Y', strtotime('-4 year', strtotime( date('Y') ))) }}</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <span class="stanggal-text">Ke Tanggal</span>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group">
-                                            <select class="form-control cust-control" name="month_to">
-                                                <option value="">Semua bulan</option>
-                                                <option <?php if($bulan_ini == "January") echo 'selected' ;?> value="01">January</option>
-                                                <option <?php if($bulan_ini == "February") echo 'selected' ;?> value="02">February</option>
-                                                <option <?php if($bulan_ini == "March") echo 'selected' ;?> value="03">March</option>
-                                                <option <?php if($bulan_ini == "April") echo 'selected' ;?> value="04">April</option>
-                                                <option <?php if($bulan_ini == "May") echo 'selected' ;?> value="05">May</option>
-                                                <option <?php if($bulan_ini == "June") echo 'selected' ;?> value="06">June</option>
-                                                <option <?php if($bulan_ini == "July") echo 'selected' ;?> value="07">July</option>
-                                                <option <?php if($bulan_ini == "August") echo 'selected' ;?> value="08">August</option>
-                                                <option <?php if($bulan_ini == "September") echo 'selected' ;?> value="09">September</option>
-                                                <option <?php if($bulan_ini == "October") echo 'selected' ;?> value="10">October</option>
-                                                <option <?php if($bulan_ini == "November") echo 'selected' ;?> value="11">November</option>
-                                                <option <?php if($bulan_ini == "December") echo 'selected' ;?> value="12">December</option>
-                                                
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <select class="form-control cust-control" name="year_to">
-                                            <option value="">Semua tahun</option>
-                                            <option  <?php if($tahun_ini == date('Y') ) echo 'selected' ;?> value="{{ date('Y') }}">{{ date('Y') }}</option>
-                                            <option  <?php if($tahun_ini ==  date('Y', strtotime('-1 year', strtotime( date('Y') ))) ) echo 'selected' ;?> value="{{ date('Y', strtotime('-1 year', strtotime( date('Y') ))) }}">{{ date('Y', strtotime('-1 year', strtotime( date('Y') ))) }}</option>
-                                            <option  <?php if($tahun_ini ==  date('Y', strtotime('-2 year', strtotime( date('Y') ))) ) echo 'selected' ;?> value="{{ date('Y', strtotime('-2 year', strtotime( date('Y') ))) }}">{{ date('Y', strtotime('-2 year', strtotime( date('Y') ))) }}</option>
-                                            <option  <?php if($tahun_ini ==  date('Y', strtotime('-3 year', strtotime( date('Y') ))) ) echo 'selected' ;?> value="{{ date('Y', strtotime('-3 year', strtotime( date('Y') ))) }}">{{ date('Y', strtotime('-3 year', strtotime( date('Y') ))) }}</option>
-                                            <option  <?php if($tahun_ini ==  date('Y', strtotime('-4 year', strtotime( date('Y') ))) ) echo 'selected' ;?> value="{{ date('Y', strtotime('-4 year', strtotime( date('Y') ))) }}">{{ date('Y', strtotime('-4 year', strtotime( date('Y') ))) }}</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <button id="btn-submit-profit-loss" class="btn btn-primary">Submit</button>
-                                    </div>
-                                </div>
                                 </form>
                                 <div class="mtop20"></div>
                                 <div class="row">

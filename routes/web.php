@@ -45,6 +45,17 @@ Route::group(['middleware' => 'mAuth'], function () {
     Route::post('submit_profit_loss', [ReportController::class, 'submit_profit_loss']);
     Route::get('balance', [ReportController::class, 'balance']);
     Route::post('submit_balance_sheet', [ReportController::class, 'submit_balance_sheet']);
+    Route::get('journal_report', [ReportController::class, 'journal_report']);
+    Route::post('journal_report_submit', [ReportController::class, 'journal_report_submit']);
+    Route::get('trial_balance', [ReportController::class, 'trial_balance']);
+    Route::post('trial_balance_submit', [ReportController::class, 'trial_balance_submit']);
+    Route::get('general_ledger', [ReportController::class, 'general_ledger']);
+    Route::post('general_ledger_submit', [ReportController::class, 'general_ledger_submit']);
+
+    Route::get('profit_loss_export/{tanggal}', [ReportController::class, 'profit_loss_export']);
+    Route::get('balance_sheet_export/{tanggal}', [ReportController::class, 'balance_sheet_export']);
+
+
 
     Route::get('setting', [SettingController::class,'index']);
     Route::get('generate_opening_balance', [SettingController::class, 'generate_opening_balance']);
